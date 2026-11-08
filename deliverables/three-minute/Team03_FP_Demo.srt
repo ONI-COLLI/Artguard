@@ -1,0 +1,134 @@
+1
+00:00:00,000 --> 00:00:04,328
+ArtGuard · real local-network demonstration
+Deploy a smart contract, buy a license, release escrow and verify a co-author payout.
+
+2
+00:00:04,328 --> 00:00:41,017
+01 · Deploy contracts and launch real checks
+These commands run now. Solidity contracts deploy to Anvil, chain 31337. Selected unit and escrow tests run independently.
+
+3
+00:00:41,017 --> 00:00:49,017
+DEPLOYMENT PROOF
+A successful deployment receipt creates this contract address. Non-empty runtime bytecode confirms that Solidity code exists on the local EVM.
+
+4
+00:00:49,017 --> 00:00:58,559
+01 · Deploy contracts and launch real checks
+These commands run now. Solidity contracts deploy to Anvil, chain 31337. Selected unit and escrow tests run independently.
+
+5
+00:00:58,559 --> 00:01:06,439
+02 · Find the project
+The buyer opens the real Marketplace. The project is already registered with its file and terms fingerprints.
+
+6
+00:01:06,439 --> 00:01:13,517
+03 · Connect and review the offer
+The demo buyer wallet connects on the local test chain. This is the site’s actual checkout component.
+
+7
+00:01:13,517 --> 00:01:19,517
+THE SIGNED OFFER
+The EIP-712 signature binds the buyer, file and terms fingerprints, amount, fee, shares and expiry. Changing a signed value invalidates the offer.
+
+8
+00:01:19,517 --> 00:01:20,476
+03 · Connect and review the offer
+The demo buyer wallet connects on the local test chain. This is the site’s actual checkout component.
+
+9
+00:01:20,476 --> 00:01:25,561
+04 · Deposit into escrow
+The buyer signs a real buyLicenses transaction. The contract checks the buyer, signed offer, fingerprints, amount and expiry.
+
+10
+00:01:25,561 --> 00:01:28,017
+05 · Creator confirms delivery
+Payment is held in the contract. No license or co-author revenue exists yet. The creator confirms delivery.
+
+11
+00:01:28,017 --> 00:01:35,017
+ESCROW HOLDS THE PAYMENT
+The 0.012 test ETH stays in the contract after deposit. The license has not started, and recipients cannot withdraw this order’s proceeds yet.
+
+12
+00:01:35,017 --> 00:01:38,686
+05 · Creator confirms delivery
+Payment is held in the contract. No license or co-author revenue exists yet. The creator confirms delivery.
+
+13
+00:01:38,686 --> 00:01:43,602
+06 · Buyer accepts and releases payment
+Acceptance is another real transaction. It starts the license and allocates platform, creator and co-author credits.
+
+14
+00:01:43,602 --> 00:01:46,517
+07 · The purchased license
+The real Licenses page now contains the buyer’s rights and protected original download. Copyright stays with the creator.
+
+15
+00:01:46,517 --> 00:01:52,517
+LICENSE OWNERSHIP
+Acceptance records the buyer wallet, artwork and selected license on-chain. ArtGuard verifies the release before unlocking the protected original file.
+
+16
+00:01:52,517 --> 00:01:54,661
+07 · The purchased license
+The real Licenses page now contains the buyer’s rights and protected original download. Copyright stays with the creator.
+
+17
+00:01:54,661 --> 00:01:58,017
+08 · Creator earnings
+Free plan commission is 10%. The remaining amount is shared 75/25. These amounts are read from the contract.
+
+18
+00:01:58,017 --> 00:02:05,017
+REVENUE ALLOCATION
+0.012 test ETH minus 10% leaves 0.0108: creator credit 0.0081, co-author credit 0.0027. Each recipient withdraws separately; gas is additional.
+
+19
+00:02:05,017 --> 00:02:07,308
+08 · Creator earnings
+Free plan commission is 10%. The remaining amount is shared 75/25. These amounts are read from the contract.
+
+20
+00:02:07,308 --> 00:02:14,339
+09 · Co-author withdraws
+The co-author signs withdraw with their own test wallet. Contract credit becomes a wallet transfer; gas is separate.
+
+21
+00:02:14,339 --> 00:02:24,017
+10 · Verify directly from the EVM
+This is the site’s real verification component. It reads receipts, canonical blocks, contract events, license state and withdrawals without a purchase database record.
+
+22
+00:02:24,017 --> 00:02:34,017
+VERIFY THE TRANSACTIONS
+Deposit, release and withdrawal have different transaction hashes. The local EVM confirms successful receipts, canonical blocks and the active license.
+
+23
+00:02:34,017 --> 00:02:36,472
+10 · Verify directly from the EVM
+This is the site’s real verification component. It reads receipts, canonical blocks, contract events, license state and withdrawals without a purchase database record.
+
+24
+00:02:36,472 --> 00:02:42,517
+11 · Actual test results
+These are the fresh commands started at the beginning of this run. Counts and exit codes come from the real test processes.
+
+25
+00:02:42,517 --> 00:02:50,850
+READ THE ACTUAL TEST RESULTS
+This recorded run passed 21 selected application unit tests and 10 EVM escrow tests: 0 failures, exit code 0. These are actual results from the saved run.
+
+26
+00:02:50,850 --> 00:02:53,990
+11 · Actual test results
+These are the fresh commands started at the beginning of this run. Counts and exit codes come from the real test processes.
+
+27
+00:02:53,990 --> 00:03:00,000
+ArtGuard · verified on a local blockchain
+Contract deployed. License purchased through escrow. Co-author paid. Selected unit and EVM tests passed.

@@ -1,0 +1,15 @@
+{
+  "team": "03",
+  "date": "8 November 2026",
+  "githubUrl": "https://github.com/ONI-COLLI/Artguard",
+  "oneDriveUrl": null,
+  "aiTool": "Codex",
+  "aiModel": "GPT-6.1 Sol",
+  "teamReviewConfirmed": false,
+  "members": [
+    { "name": "Assan Dairabaev", "group": "SE-2533", "role": "CEO", "area": "Introduction, pitch and conclusion" },
+    { "name": "Demezhan Kaidar", "group": "SE-2533", "role": "CTO", "area": "Architecture, contracts, security and technical evidence" },
+    { "name": "Yevgeniy Tyo", "group": "SE-2533", "role": "CFO", "area": "Financial assumptions, model and sensitivity analysis" },
+    { "name": "Kalybek Zhumabekov", "group": "SE-2533", "role": "COO", "area": "Operations, risk and regulatory analysis" }
+  ]
+}

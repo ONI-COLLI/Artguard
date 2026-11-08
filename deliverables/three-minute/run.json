@@ -1,0 +1,322 @@
+{
+  "enabled": true,
+  "runId": "ccab5e4f-561c-473b-b35c-44019c1d437c",
+  "phase": "ready",
+  "startedAt": "2026-11-08T12:58:54.625Z",
+  "error": "",
+  "events": [
+    {
+      "at": "2026-11-08T12:58:54.627Z",
+      "channel": "deploy",
+      "text": "$ npm run chain"
+    },
+    {
+      "at": "2026-11-08T12:58:54.628Z",
+      "channel": "unit",
+      "text": "$ npm run test:defense:unit"
+    },
+    {
+      "at": "2026-11-08T12:58:54.650Z",
+      "channel": "contracts",
+      "text": "$ npm run test:defense:contracts"
+    },
+    {
+      "at": "2026-11-08T12:58:55.137Z",
+      "channel": "contracts",
+      "text": "> artguard-local@1.0.0 test:defense:contracts"
+    },
+    {
+      "at": "2026-11-08T12:58:55.138Z",
+      "channel": "contracts",
+      "text": "> tsx --test tests/escrow.test.ts"
+    },
+    {
+      "at": "2026-11-08T12:58:55.140Z",
+      "channel": "unit",
+      "text": "> artguard-local@1.0.0 test:defense:unit"
+    },
+    {
+      "at": "2026-11-08T12:58:55.141Z",
+      "channel": "unit",
+      "text": "> vitest run tests/demo-session.test.tsx tests/blockchain-checkout.test.tsx tests/revenue-sharing.test.tsx tests/buyer-license.test.tsx tests/escrow-ui.test.tsx --maxWorkers=1 --no-file-parallelism"
+    },
+    {
+      "at": "2026-11-08T12:58:55.461Z",
+      "channel": "contracts",
+      "text": "TAP version 13"
+    },
+    {
+      "at": "2026-11-08T12:58:59.483Z",
+      "channel": "deploy",
+      "text": "ArtGuard local chain ready: http://127.0.0.1:8665 (chain 31337)"
+    },
+    {
+      "at": "2026-11-08T12:58:59.485Z",
+      "channel": "deploy",
+      "text": "Registry: 0x5fbdb2315678afecb367f032d93f642f64180aa3. State saved under data/chain. Test ETH only."
+    },
+    {
+      "at": "2026-11-08T12:59:06.033Z",
+      "channel": "deploy",
+      "text": "License marketplace: 0xe7f1725e7734ce288f8367e1bb143e90bb3f0512. Test ETH checkout ready."
+    },
+    {
+      "at": "2026-11-08T12:59:12.495Z",
+      "channel": "deploy",
+      "text": "Timed licenses: 0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0. Previous perpetual licenses preserved."
+    },
+    {
+      "at": "2026-11-08T12:59:23.204Z",
+      "channel": "deploy",
+      "text": "Escrow marketplace: 0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9"
+    },
+    {
+      "at": "2026-11-08T12:59:25.999Z",
+      "channel": "contracts",
+      "text": "ok 1 - deposit holds funds, issues no license or revenue, checks permissions and rejects invalid quotes"
+    },
+    {
+      "at": "2026-11-08T12:59:26.525Z",
+      "channel": "deploy",
+      "text": "Subscription payments: 0xdc64a140aa3e981100a9beca4e685f962f0cf6c9. Prepaid 30-day test plans ready."
+    },
+    {
+      "at": "2026-11-08T12:59:26.714Z",
+      "channel": "contracts",
+      "text": "ok 2 - acceptance releases exact fees and co-author shares, starts the period and makes withdrawals real"
+    },
+    {
+      "at": "2026-11-08T12:59:27.266Z",
+      "channel": "contracts",
+      "text": "ok 3 - no delivery permits a full refundable credit after 72 hours, then an exact wallet refund and repurchase"
+    },
+    {
+      "at": "2026-11-08T12:59:27.684Z",
+      "channel": "contracts",
+      "text": "ok 4 - review timeout enables release without buyer acceptance; it never releases just from an API read"
+    },
+    {
+      "at": "2026-11-08T12:59:28.284Z",
+      "channel": "contracts",
+      "text": "ok 5 - dispute blocks payouts, manager decisions are authorized, recorded and verified on-chain"
+    },
+    {
+      "at": "2026-11-08T12:59:29.139Z",
+      "channel": "contracts",
+      "text": "ok 6 - manager may release a valid disputed delivery; unresolved disputes allow refund after 7 days"
+    },
+    {
+      "at": "2026-11-08T12:59:29.803Z",
+      "channel": "deploy",
+      "text": "Promotion payments: 0x5fc8d32690cc91d4c39d9d3abcbd16989f875707. Paid 7-day placements ready."
+    },
+    {
+      "at": "2026-11-08T12:59:29.877Z",
+      "channel": "deploy",
+      "text": "ArtworkRegistry · status success · block 1 · 567 bytes"
+    },
+    {
+      "at": "2026-11-08T12:59:29.892Z",
+      "channel": "deploy",
+      "text": "Escrow marketplace v4 · status success · block 4 · 11594 bytes"
+    },
+    {
+      "at": "2026-11-08T12:59:29.894Z",
+      "channel": "setup",
+      "text": "Preparing fictional creator, buyer and co-author wallets; registering Shared Horizons."
+    },
+    {
+      "at": "2026-11-08T12:59:29.942Z",
+      "channel": "contracts",
+      "text": "ok 7 - bulk deposits can settle independently and a restart preserves escrow state and released licenses"
+    },
+    {
+      "at": "2026-11-08T12:59:30.221Z",
+      "channel": "contracts",
+      "text": "ok 8 - the new contract inherits older license expiry and preserves the older contract credits"
+    },
+    {
+      "at": "2026-11-08T12:59:30.785Z",
+      "channel": "contracts",
+      "text": "ok 9 - reconciliation distinguishes locked deposits, recipient credits and refunded credits at the same block"
+    },
+    {
+      "at": "2026-11-08T12:59:31.987Z",
+      "channel": "contracts",
+      "text": "ok 10 - prepared demo wallets fund, deliver, release, dispute and withdraw refunds through the restricted site signer"
+    },
+    {
+      "at": "2026-11-08T12:59:32.090Z",
+      "channel": "contracts",
+      "text": "# tests 10"
+    },
+    {
+      "at": "2026-11-08T12:59:32.091Z",
+      "channel": "contracts",
+      "text": "# pass 10"
+    },
+    {
+      "at": "2026-11-08T12:59:32.092Z",
+      "channel": "contracts",
+      "text": "# fail 0"
+    },
+    {
+      "at": "2026-11-08T12:59:32.094Z",
+      "channel": "contracts",
+      "text": "# duration_ms 36659.0863"
+    },
+    {
+      "at": "2026-11-08T12:59:32.138Z",
+      "channel": "contracts",
+      "text": "10 passed · 0 failed · process exit 0"
+    },
+    {
+      "at": "2026-11-08T12:59:35.211Z",
+      "channel": "setup",
+      "text": "Ready. The following clicks use the real ArtGuard pages and signed local EVM transactions."
+    },
+    {
+      "at": "2026-11-08T12:59:35.964Z",
+      "channel": "unit",
+      "text": " Test Files  5 passed (5)"
+    },
+    {
+      "at": "2026-11-08T12:59:35.966Z",
+      "channel": "unit",
+      "text": "      Tests  21 passed (21)"
+    },
+    {
+      "at": "2026-11-08T12:59:35.967Z",
+      "channel": "unit",
+      "text": "   Duration  39.98s (environment 41%, import 30%, tests 19%, setup 9%, transform 1%)"
+    },
+    {
+      "at": "2026-11-08T12:59:36.030Z",
+      "channel": "unit",
+      "text": "21 passed · 0 failed · process exit 0"
+    },
+    {
+      "at": "2026-11-08T12:59:40.856Z",
+      "channel": "stage",
+      "text": "02 · Find the project"
+    },
+    {
+      "at": "2026-11-08T12:59:48.736Z",
+      "channel": "stage",
+      "text": "03 · Connect and review the offer"
+    },
+    {
+      "at": "2026-11-08T12:59:56.773Z",
+      "channel": "stage",
+      "text": "04 · Deposit into escrow"
+    },
+    {
+      "at": "2026-11-08T13:00:01.858Z",
+      "channel": "stage",
+      "text": "05 · Creator confirms delivery"
+    },
+    {
+      "at": "2026-11-08T13:00:07.983Z",
+      "channel": "stage",
+      "text": "06 · Buyer accepts and releases payment"
+    },
+    {
+      "at": "2026-11-08T13:00:12.899Z",
+      "channel": "stage",
+      "text": "07 · The purchased license"
+    },
+    {
+      "at": "2026-11-08T13:00:17.958Z",
+      "channel": "stage",
+      "text": "08 · Creator earnings"
+    },
+    {
+      "at": "2026-11-08T13:00:23.605Z",
+      "channel": "stage",
+      "text": "09 · Co-author withdraws"
+    },
+    {
+      "at": "2026-11-08T13:00:30.636Z",
+      "channel": "stage",
+      "text": "10 · Verify directly from the EVM"
+    },
+    {
+      "at": "2026-11-08T13:00:42.761Z",
+      "channel": "proof",
+      "text": "Verified 10 live EVM checks, active license and withdrawal."
+    },
+    {
+      "at": "2026-11-08T13:00:42.769Z",
+      "channel": "stage",
+      "text": "11 · Actual test results"
+    },
+    {
+      "at": "2026-11-08T13:00:51.954Z",
+      "channel": "stage",
+      "text": "Completed"
+    }
+  ],
+  "jobs": {
+    "unit": {
+      "command": "npm run test:defense:unit",
+      "status": "passed",
+      "passed": 21,
+      "failed": 0,
+      "exitCode": 0,
+      "lines": [
+        "> artguard-local@1.0.0 test:defense:unit",
+        "> vitest run tests/demo-session.test.tsx tests/blockchain-checkout.test.tsx tests/revenue-sharing.test.tsx tests/buyer-license.test.tsx tests/escrow-ui.test.tsx --maxWorkers=1 --no-file-parallelism",
+        " Test Files  5 passed (5)",
+        "      Tests  21 passed (21)",
+        "   Duration  39.98s (environment 41%, import 30%, tests 19%, setup 9%, transform 1%)"
+      ]
+    },
+    "contracts": {
+      "command": "npm run test:defense:contracts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0,
+      "exitCode": 0,
+      "lines": [
+        "> artguard-local@1.0.0 test:defense:contracts",
+        "> tsx --test tests/escrow.test.ts",
+        "TAP version 13",
+        "ok 1 - deposit holds funds, issues no license or revenue, checks permissions and rejects invalid quotes",
+        "ok 2 - acceptance releases exact fees and co-author shares, starts the period and makes withdrawals real",
+        "ok 3 - no delivery permits a full refundable credit after 72 hours, then an exact wallet refund and repurchase",
+        "ok 4 - review timeout enables release without buyer acceptance; it never releases just from an API read",
+        "ok 5 - dispute blocks payouts, manager decisions are authorized, recorded and verified on-chain",
+        "ok 6 - manager may release a valid disputed delivery; unresolved disputes allow refund after 7 days",
+        "ok 7 - bulk deposits can settle independently and a restart preserves escrow state and released licenses",
+        "ok 8 - the new contract inherits older license expiry and preserves the older contract credits",
+        "ok 9 - reconciliation distinguishes locked deposits, recipient credits and refunded credits at the same block",
+        "ok 10 - prepared demo wallets fund, deliver, release, dispute and withdraw refunds through the restricted site signer",
+        "# tests 10",
+        "# pass 10",
+        "# fail 0",
+        "# duration_ms 36659.0863"
+      ]
+    }
+  },
+  "contracts": [
+    {
+      "name": "ArtworkRegistry",
+      "address": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      "hash": "0xdbd914f3a5129178a5b8c18e3e52ea3aaf201f9159284195ba2712cf7efaf979",
+      "block": "1",
+      "bytecodeBytes": 567
+    },
+    {
+      "name": "Escrow marketplace v4",
+      "address": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "hash": "0xb4dcb878bb0e84b4791f07dc047f3f40758a7986c3bb0d25226b74916d993fb4",
+      "block": "4",
+      "bytecodeBytes": 11594
+    }
+  ],
+  "project": {
+    "id": "865d36a9-5f42-4fe5-93db-c31317b4368c",
+    "title": "Shared Horizons — demo project"
+  },
+  "depositHash": "0x34ae9d9494b596fbeca51f0a9bd436af51b6e6f6696c054f4898b402b2c3f11d"
+}

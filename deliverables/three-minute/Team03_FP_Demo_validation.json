@@ -1,0 +1,105 @@
+{
+  "file": "Team03_FP_Demo.mp4",
+  "kind": "Actual native-site recording with labeled explanatory reading pauses",
+  "durationSeconds": 180,
+  "fps": 60.0,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "decodedFrames": 10800,
+  "fullDecodePassed": true,
+  "audio": false,
+  "simulatedTransactions": false,
+  "sourceRecording": "2026-11-08 17-58-50.mp4",
+  "sourceClipSha256": "bf7cca957905f9c9b19ba82a5e3fc313080a3318da86eb8b638737b94ad998f0",
+  "originalFrames": 7660,
+  "readingPauseFrames": 3140,
+  "playbackSpeed": 1,
+  "sha256": "880f8342f2820bf438d9dd157e0eede064806b95d171fcacb41dc41f86c29a8b",
+  "checkedSections": [
+    3,
+    20,
+    45.016666666666666,
+    76.51666666666667,
+    91.51666666666667,
+    109.51666666666667,
+    121.51666666666667,
+    149.01666666666668,
+    166.68333333333334,
+    177
+  ],
+  "edit": "Seven labeled reading pauses added to the original verified recording. Original motion and command output remain at normal speed; no new transaction or test run is implied.",
+  "readingPauses": [
+    {
+      "sourceFrame": 2460,
+      "sourceTime": 41,
+      "frames": 480,
+      "start": 41.016666666666666,
+      "end": 49.016666666666666,
+      "title": "DEPLOYMENT PROOF",
+      "caption": "A successful deployment receipt creates this contract address. Non-empty runtime bytecode confirms that Solidity code exists on the local EVM.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 3930,
+      "sourceTime": 65.5,
+      "frames": 360,
+      "start": 73.51666666666667,
+      "end": 79.51666666666667,
+      "title": "THE SIGNED OFFER",
+      "caption": "The EIP-712 signature binds the buyer, file and terms fingerprints, amount, fee, shares and expiry. Changing a signed value invalidates the offer.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 4440,
+      "sourceTime": 74,
+      "frames": 420,
+      "start": 88.01666666666667,
+      "end": 95.01666666666667,
+      "title": "ESCROW HOLDS THE PAYMENT",
+      "caption": "The 0.012 test ETH stays in the contract after deposit. The license has not started, and recipients cannot withdraw this order\u2019s proceeds yet.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 5130,
+      "sourceTime": 85.5,
+      "frames": 360,
+      "start": 106.51666666666667,
+      "end": 112.51666666666667,
+      "title": "LICENSE OWNERSHIP",
+      "caption": "Acceptance records the buyer wallet, artwork and selected license on-chain. ArtGuard verifies the release before unlocking the protected original file.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 5460,
+      "sourceTime": 91,
+      "frames": 420,
+      "start": 118.01666666666667,
+      "end": 125.01666666666667,
+      "title": "REVENUE ALLOCATION",
+      "caption": "0.012 test ETH minus 10% leaves 0.0108: creator credit 0.0081, co-author credit 0.0027. Each recipient withdraws separately; gas is additional.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 6600,
+      "sourceTime": 110,
+      "frames": 600,
+      "start": 144.01666666666668,
+      "end": 154.01666666666668,
+      "title": "VERIFY THE TRANSACTIONS",
+      "caption": "Deposit, release and withdrawal have different transaction hashes. The local EVM confirms successful receipts, canonical blocks and the active license.",
+      "kind": "reading-pause"
+    },
+    {
+      "sourceFrame": 7110,
+      "sourceTime": 118.5,
+      "frames": 500,
+      "start": 162.51666666666668,
+      "end": 170.85000000000002,
+      "title": "READ THE ACTUAL TEST RESULTS",
+      "caption": "This recorded run passed 21 selected application unit tests and 10 EVM escrow tests: 0 failures, exit code 0. These are actual results from the saved run.",
+      "kind": "reading-pause"
+    }
+  ]
+}

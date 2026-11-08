@@ -1,0 +1,88 @@
+{
+  "status": "verified",
+  "checkedAt": "2026-11-08T13:00:42.760Z",
+  "source": "anvil_rpc",
+  "message": "The local node confirms this deposit and the current escrow state. Allocations and withdrawals are separate transactions.",
+  "checks": [
+    {
+      "label": "Deposit succeeded at a configured escrow contract",
+      "passed": true
+    },
+    {
+      "label": "Deposit belongs to the canonical block and deployed contract code",
+      "passed": true
+    },
+    {
+      "label": "Transaction calls buyLicenses to fund escrow",
+      "passed": true
+    },
+    {
+      "label": "Transferred amount equals the signed order total",
+      "passed": true
+    },
+    {
+      "label": "EscrowFunded events match buyer, seller, file, terms, price and period",
+      "passed": true
+    },
+    {
+      "label": "Contract storage and consumed quote match order 0x6f73d31c",
+      "passed": true
+    },
+    {
+      "label": "A unique on-chain settlement event exists",
+      "passed": true
+    },
+    {
+      "label": "Settlement transaction succeeded at the escrow contract",
+      "passed": true
+    },
+    {
+      "label": "License and period were issued on release, not deposit",
+      "passed": true
+    },
+    {
+      "label": "All creator and co-author allocations match the signed split",
+      "passed": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "0x6f73d31c35ba9273ee5c441b8f3efa08203dc17018bb2ca57e27670c8544303b",
+      "state": "released",
+      "buyer": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      "seller": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "12000000000000000",
+      "heldWei": "0",
+      "depositHash": "0x34ae9d9494b596fbeca51f0a9bd436af51b6e6f6696c054f4898b402b2c3f11d",
+      "block": "8",
+      "deliveryDeadline": 1794401998,
+      "reviewDeadline": 1794229205,
+      "disputeDeadline": 0,
+      "releaseHash": "0x00cecaaa23803fbdd83f8501d11ac405a4657eb57fce9f52590e634b98f7991e",
+      "refundHash": null,
+      "licenseActive": true,
+      "refundBalanceWei": "0",
+      "allocations": [
+        {
+          "wallet": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "amountWei": "1200000000000000"
+        },
+        {
+          "wallet": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+          "amountWei": "2700000000000000"
+        },
+        {
+          "wallet": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei": "8100000000000000"
+        }
+      ],
+      "withdrawals": [
+        {
+          "wallet": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+          "amountWei": "2700000000000000",
+          "hash": "0x580fdebd429abfe00ce413e5c9e16e5d4570f8c412c0f8f711a78e8e2bf1294a"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "checkedAt": "2026-11-08T13:03:04.906Z",
+  "chainId": 31337,
+  "source": "Fresh read from the current Anvil JSON-RPC, not the purchase database",
+  "receipts": [
+    {
+      "hash": "0xdbd914f3a5129178a5b8c18e3e52ea3aaf201f9159284195ba2712cf7efaf979",
+      "status": "success",
+      "block": "1",
+      "blockHash": "0x4797691a1b0e833ac7a8155f05b4e5c98237d943bf834be615b8d114a2768415",
+      "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+      "to": null,
+      "valueWei": "0",
+      "gasUsed": "177695",
+      "logCount": 0
+    },
+    {
+      "hash": "0xb4dcb878bb0e84b4791f07dc047f3f40758a7986c3bb0d25226b74916d993fb4",
+      "status": "success",
+      "block": "4",
+      "blockHash": "0x7d7dbfed0295f0eca97a445e1b90e2d39828ea907dc6182edf88f102c3f107fe",
+      "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+      "to": null,
+      "valueWei": "0",
+      "gasUsed": "2606111",
+      "logCount": 0
+    },
+    {
+      "hash": "0x34ae9d9494b596fbeca51f0a9bd436af51b6e6f6696c054f4898b402b2c3f11d",
+      "status": "success",
+      "block": "8",
+      "blockHash": "0x6bb242ff4937b7643cc494a3e69362dae2771f5844e06d4ba07a7c5eb5318c80",
+      "from": "0x90f79bf6eb2c4f870365e785982e1f101e93b906",
+      "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "valueWei": "12000000000000000",
+      "gasUsed": "568121",
+      "logCount": 1
+    },
+    {
+      "hash": "0x00cecaaa23803fbdd83f8501d11ac405a4657eb57fce9f52590e634b98f7991e",
+      "status": "success",
+      "block": "10",
+      "blockHash": "0x33020376e321b76dc12e306f6a6b8f2e25338340a2717abf6399d3b30fb850d9",
+      "from": "0x90f79bf6eb2c4f870365e785982e1f101e93b906",
+      "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "valueWei": "0",
+      "gasUsed": "176494",
+      "logCount": 5
+    },
+    {
+      "hash": "0x580fdebd429abfe00ce413e5c9e16e5d4570f8c412c0f8f711a78e8e2bf1294a",
+      "status": "success",
+      "block": "11",
+      "blockHash": "0x31bc92f6f2b3506461a5bb54bad3245bdf1daf22fc70fee9511d9ef77ea18b33",
+      "from": "0x15d34aaf54267db7d7c367839aaf71a00a2c6a65",
+      "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "valueWei": "0",
+      "gasUsed": "32397",
+      "logCount": 1
+    }
+  ]
+}

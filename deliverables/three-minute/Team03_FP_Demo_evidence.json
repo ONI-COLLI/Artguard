@@ -1,0 +1,566 @@
+{
+  "team": 3,
+  "runId": "ccab5e4f-561c-473b-b35c-44019c1d437c",
+  "startedAt": "2026-11-08T12:58:54.625Z",
+  "media": {
+    "file": "Team03_FP_Demo.mp4",
+    "kind": "Actual native-site recording with labeled explanatory reading pauses",
+    "durationSeconds": 180,
+    "fps": 60.0,
+    "resolution": [
+      1920,
+      1080
+    ],
+    "decodedFrames": 10800,
+    "fullDecodePassed": true,
+    "audio": false,
+    "simulatedTransactions": false,
+    "sourceRecording": "2026-11-08 17-58-50.mp4",
+    "sourceClipSha256": "bf7cca957905f9c9b19ba82a5e3fc313080a3318da86eb8b638737b94ad998f0",
+    "originalFrames": 7660,
+    "readingPauseFrames": 3140,
+    "playbackSpeed": 1,
+    "sha256": "880f8342f2820bf438d9dd157e0eede064806b95d171fcacb41dc41f86c29a8b",
+    "checkedSections": [
+      3,
+      20,
+      45.016666666666666,
+      76.51666666666667,
+      91.51666666666667,
+      109.51666666666667,
+      121.51666666666667,
+      149.01666666666668,
+      166.68333333333334,
+      177
+    ],
+    "edit": "Seven labeled reading pauses added to the original verified recording. Original motion and command output remain at normal speed; no new transaction or test run is implied.",
+    "readingPauses": [
+      {
+        "sourceFrame": 2460,
+        "sourceTime": 41,
+        "frames": 480,
+        "start": 41.016666666666666,
+        "end": 49.016666666666666,
+        "title": "DEPLOYMENT PROOF",
+        "caption": "A successful deployment receipt creates this contract address. Non-empty runtime bytecode confirms that Solidity code exists on the local EVM.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 3930,
+        "sourceTime": 65.5,
+        "frames": 360,
+        "start": 73.51666666666667,
+        "end": 79.51666666666667,
+        "title": "THE SIGNED OFFER",
+        "caption": "The EIP-712 signature binds the buyer, file and terms fingerprints, amount, fee, shares and expiry. Changing a signed value invalidates the offer.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 4440,
+        "sourceTime": 74,
+        "frames": 420,
+        "start": 88.01666666666667,
+        "end": 95.01666666666667,
+        "title": "ESCROW HOLDS THE PAYMENT",
+        "caption": "The 0.012 test ETH stays in the contract after deposit. The license has not started, and recipients cannot withdraw this order\u2019s proceeds yet.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 5130,
+        "sourceTime": 85.5,
+        "frames": 360,
+        "start": 106.51666666666667,
+        "end": 112.51666666666667,
+        "title": "LICENSE OWNERSHIP",
+        "caption": "Acceptance records the buyer wallet, artwork and selected license on-chain. ArtGuard verifies the release before unlocking the protected original file.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 5460,
+        "sourceTime": 91,
+        "frames": 420,
+        "start": 118.01666666666667,
+        "end": 125.01666666666667,
+        "title": "REVENUE ALLOCATION",
+        "caption": "0.012 test ETH minus 10% leaves 0.0108: creator credit 0.0081, co-author credit 0.0027. Each recipient withdraws separately; gas is additional.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 6600,
+        "sourceTime": 110,
+        "frames": 600,
+        "start": 144.01666666666668,
+        "end": 154.01666666666668,
+        "title": "VERIFY THE TRANSACTIONS",
+        "caption": "Deposit, release and withdrawal have different transaction hashes. The local EVM confirms successful receipts, canonical blocks and the active license.",
+        "kind": "reading-pause"
+      },
+      {
+        "sourceFrame": 7110,
+        "sourceTime": 118.5,
+        "frames": 500,
+        "start": 162.51666666666668,
+        "end": 170.85000000000002,
+        "title": "READ THE ACTUAL TEST RESULTS",
+        "caption": "This recorded run passed 21 selected application unit tests and 10 EVM escrow tests: 0 failures, exit code 0. These are actual results from the saved run.",
+        "kind": "reading-pause"
+      }
+    ]
+  },
+  "deployments": [
+    {
+      "name": "ArtworkRegistry",
+      "address": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      "hash": "0xdbd914f3a5129178a5b8c18e3e52ea3aaf201f9159284195ba2712cf7efaf979",
+      "block": "1",
+      "bytecodeBytes": 567
+    },
+    {
+      "name": "Escrow marketplace v4",
+      "address": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "hash": "0xb4dcb878bb0e84b4791f07dc047f3f40758a7986c3bb0d25226b74916d993fb4",
+      "block": "4",
+      "bytecodeBytes": 11594
+    }
+  ],
+  "tests": {
+    "unit": {
+      "command": "npm run test:defense:unit",
+      "status": "passed",
+      "passed": 21,
+      "failed": 0,
+      "exitCode": 0,
+      "lines": [
+        "> artguard-local@1.0.0 test:defense:unit",
+        "> vitest run tests/demo-session.test.tsx tests/blockchain-checkout.test.tsx tests/revenue-sharing.test.tsx tests/buyer-license.test.tsx tests/escrow-ui.test.tsx --maxWorkers=1 --no-file-parallelism",
+        " Test Files  5 passed (5)",
+        "      Tests  21 passed (21)",
+        "   Duration  39.98s (environment 41%, import 30%, tests 19%, setup 9%, transform 1%)"
+      ]
+    },
+    "contracts": {
+      "command": "npm run test:defense:contracts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0,
+      "exitCode": 0,
+      "lines": [
+        "> artguard-local@1.0.0 test:defense:contracts",
+        "> tsx --test tests/escrow.test.ts",
+        "TAP version 13",
+        "ok 1 - deposit holds funds, issues no license or revenue, checks permissions and rejects invalid quotes",
+        "ok 2 - acceptance releases exact fees and co-author shares, starts the period and makes withdrawals real",
+        "ok 3 - no delivery permits a full refundable credit after 72 hours, then an exact wallet refund and repurchase",
+        "ok 4 - review timeout enables release without buyer acceptance; it never releases just from an API read",
+        "ok 5 - dispute blocks payouts, manager decisions are authorized, recorded and verified on-chain",
+        "ok 6 - manager may release a valid disputed delivery; unresolved disputes allow refund after 7 days",
+        "ok 7 - bulk deposits can settle independently and a restart preserves escrow state and released licenses",
+        "ok 8 - the new contract inherits older license expiry and preserves the older contract credits",
+        "ok 9 - reconciliation distinguishes locked deposits, recipient credits and refunded credits at the same block",
+        "ok 10 - prepared demo wallets fund, deliver, release, dispute and withdraw refunds through the restricted site signer",
+        "# tests 10",
+        "# pass 10",
+        "# fail 0",
+        "# duration_ms 36659.0863"
+      ]
+    }
+  },
+  "proof": {
+    "status": "verified",
+    "checkedAt": "2026-11-08T13:00:42.760Z",
+    "source": "anvil_rpc",
+    "message": "The local node confirms this deposit and the current escrow state. Allocations and withdrawals are separate transactions.",
+    "checks": [
+      {
+        "label": "Deposit succeeded at a configured escrow contract",
+        "passed": true
+      },
+      {
+        "label": "Deposit belongs to the canonical block and deployed contract code",
+        "passed": true
+      },
+      {
+        "label": "Transaction calls buyLicenses to fund escrow",
+        "passed": true
+      },
+      {
+        "label": "Transferred amount equals the signed order total",
+        "passed": true
+      },
+      {
+        "label": "EscrowFunded events match buyer, seller, file, terms, price and period",
+        "passed": true
+      },
+      {
+        "label": "Contract storage and consumed quote match order 0x6f73d31c",
+        "passed": true
+      },
+      {
+        "label": "A unique on-chain settlement event exists",
+        "passed": true
+      },
+      {
+        "label": "Settlement transaction succeeded at the escrow contract",
+        "passed": true
+      },
+      {
+        "label": "License and period were issued on release, not deposit",
+        "passed": true
+      },
+      {
+        "label": "All creator and co-author allocations match the signed split",
+        "passed": true
+      }
+    ],
+    "orders": [
+      {
+        "id": "0x6f73d31c35ba9273ee5c441b8f3efa08203dc17018bb2ca57e27670c8544303b",
+        "state": "released",
+        "buyer": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "seller": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "12000000000000000",
+        "heldWei": "0",
+        "depositHash": "0x34ae9d9494b596fbeca51f0a9bd436af51b6e6f6696c054f4898b402b2c3f11d",
+        "block": "8",
+        "deliveryDeadline": 1794401998,
+        "reviewDeadline": 1794229205,
+        "disputeDeadline": 0,
+        "releaseHash": "0x00cecaaa23803fbdd83f8501d11ac405a4657eb57fce9f52590e634b98f7991e",
+        "refundHash": null,
+        "licenseActive": true,
+        "refundBalanceWei": "0",
+        "allocations": [
+          {
+            "wallet": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "amountWei": "1200000000000000"
+          },
+          {
+            "wallet": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+            "amountWei": "2700000000000000"
+          },
+          {
+            "wallet": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei": "8100000000000000"
+          }
+        ],
+        "withdrawals": [
+          {
+            "wallet": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+            "amountWei": "2700000000000000",
+            "hash": "0x580fdebd429abfe00ce413e5c9e16e5d4570f8c412c0f8f711a78e8e2bf1294a"
+          }
+        ]
+      }
+    ]
+  },
+  "canonicalReceipts": {
+    "checkedAt": "2026-11-08T13:03:04.906Z",
+    "chainId": 31337,
+    "source": "Fresh read from the current Anvil JSON-RPC, not the purchase database",
+    "receipts": [
+      {
+        "hash": "0xdbd914f3a5129178a5b8c18e3e52ea3aaf201f9159284195ba2712cf7efaf979",
+        "status": "success",
+        "block": "1",
+        "blockHash": "0x4797691a1b0e833ac7a8155f05b4e5c98237d943bf834be615b8d114a2768415",
+        "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "to": null,
+        "valueWei": "0",
+        "gasUsed": "177695",
+        "logCount": 0
+      },
+      {
+        "hash": "0xb4dcb878bb0e84b4791f07dc047f3f40758a7986c3bb0d25226b74916d993fb4",
+        "status": "success",
+        "block": "4",
+        "blockHash": "0x7d7dbfed0295f0eca97a445e1b90e2d39828ea907dc6182edf88f102c3f107fe",
+        "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "to": null,
+        "valueWei": "0",
+        "gasUsed": "2606111",
+        "logCount": 0
+      },
+      {
+        "hash": "0x34ae9d9494b596fbeca51f0a9bd436af51b6e6f6696c054f4898b402b2c3f11d",
+        "status": "success",
+        "block": "8",
+        "blockHash": "0x6bb242ff4937b7643cc494a3e69362dae2771f5844e06d4ba07a7c5eb5318c80",
+        "from": "0x90f79bf6eb2c4f870365e785982e1f101e93b906",
+        "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+        "valueWei": "12000000000000000",
+        "gasUsed": "568121",
+        "logCount": 1
+      },
+      {
+        "hash": "0x00cecaaa23803fbdd83f8501d11ac405a4657eb57fce9f52590e634b98f7991e",
+        "status": "success",
+        "block": "10",
+        "blockHash": "0x33020376e321b76dc12e306f6a6b8f2e25338340a2717abf6399d3b30fb850d9",
+        "from": "0x90f79bf6eb2c4f870365e785982e1f101e93b906",
+        "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+        "valueWei": "0",
+        "gasUsed": "176494",
+        "logCount": 5
+      },
+      {
+        "hash": "0x580fdebd429abfe00ce413e5c9e16e5d4570f8c412c0f8f711a78e8e2bf1294a",
+        "status": "success",
+        "block": "11",
+        "blockHash": "0x31bc92f6f2b3506461a5bb54bad3245bdf1daf22fc70fee9511d9ef77ea18b33",
+        "from": "0x15d34aaf54267db7d7c367839aaf71a00a2c6a65",
+        "to": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+        "valueWei": "0",
+        "gasUsed": "32397",
+        "logCount": 1
+      }
+    ]
+  },
+  "stages": [
+    {
+      "at": "2026-11-08T12:59:40.856Z",
+      "channel": "stage",
+      "text": "02 \u00b7 Find the project"
+    },
+    {
+      "at": "2026-11-08T12:59:48.736Z",
+      "channel": "stage",
+      "text": "03 \u00b7 Connect and review the offer"
+    },
+    {
+      "at": "2026-11-08T12:59:56.773Z",
+      "channel": "stage",
+      "text": "04 \u00b7 Deposit into escrow"
+    },
+    {
+      "at": "2026-11-08T13:00:01.858Z",
+      "channel": "stage",
+      "text": "05 \u00b7 Creator confirms delivery"
+    },
+    {
+      "at": "2026-11-08T13:00:07.983Z",
+      "channel": "stage",
+      "text": "06 \u00b7 Buyer accepts and releases payment"
+    },
+    {
+      "at": "2026-11-08T13:00:12.899Z",
+      "channel": "stage",
+      "text": "07 \u00b7 The purchased license"
+    },
+    {
+      "at": "2026-11-08T13:00:17.958Z",
+      "channel": "stage",
+      "text": "08 \u00b7 Creator earnings"
+    },
+    {
+      "at": "2026-11-08T13:00:23.605Z",
+      "channel": "stage",
+      "text": "09 \u00b7 Co-author withdraws"
+    },
+    {
+      "at": "2026-11-08T13:00:30.636Z",
+      "channel": "stage",
+      "text": "10 \u00b7 Verify directly from the EVM"
+    },
+    {
+      "at": "2026-11-08T13:00:42.769Z",
+      "channel": "stage",
+      "text": "11 \u00b7 Actual test results"
+    },
+    {
+      "at": "2026-11-08T13:00:51.954Z",
+      "channel": "stage",
+      "text": "Completed"
+    }
+  ],
+  "videoTimeline": [
+    {
+      "start": 0,
+      "title": "ArtGuard \u00b7 real local-network demonstration",
+      "caption": "Deploy a smart contract, buy a license, release escrow and verify a co-author payout.",
+      "end": 4.32759428024292,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 4.32759428024292,
+      "title": "01 \u00b7 Deploy contracts and launch real checks",
+      "caption": "These commands run now. Solidity contracts deploy to Anvil, chain 31337. Selected unit and escrow tests run independently.",
+      "end": 41.016666666666666,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 41.016666666666666,
+      "end": 49.016666666666666,
+      "title": "DEPLOYMENT PROOF",
+      "caption": "A successful deployment receipt creates this contract address. Non-empty runtime bytecode confirms that Solidity code exists on the local EVM.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 49.016666666666666,
+      "title": "01 \u00b7 Deploy contracts and launch real checks",
+      "caption": "These commands run now. Solidity contracts deploy to Anvil, chain 31337. Selected unit and escrow tests run independently.",
+      "end": 58.55859422683716,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 58.55859422683716,
+      "title": "02 \u00b7 Find the project",
+      "caption": "The buyer opens the real Marketplace. The project is already registered with its file and terms fingerprints.",
+      "end": 66.43859434127808,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 66.43859434127808,
+      "title": "03 \u00b7 Connect and review the offer",
+      "caption": "The demo buyer wallet connects on the local test chain. This is the site\u2019s actual checkout component.",
+      "end": 73.51666666666667,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 73.51666666666667,
+      "end": 79.51666666666667,
+      "title": "THE SIGNED OFFER",
+      "caption": "The EIP-712 signature binds the buyer, file and terms fingerprints, amount, fee, shares and expiry. Changing a signed value invalidates the offer.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 79.51666666666667,
+      "title": "03 \u00b7 Connect and review the offer",
+      "caption": "The demo buyer wallet connects on the local test chain. This is the site\u2019s actual checkout component.",
+      "end": 80.47559428215027,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 80.47559428215027,
+      "title": "04 \u00b7 Deposit into escrow",
+      "caption": "The buyer signs a real buyLicenses transaction. The contract checks the buyer, signed offer, fingerprints, amount and expiry.",
+      "end": 85.56059432029724,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 85.56059432029724,
+      "title": "05 \u00b7 Creator confirms delivery",
+      "caption": "Payment is held in the contract. No license or co-author revenue exists yet. The creator confirms delivery.",
+      "end": 88.01666666666667,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 88.01666666666667,
+      "end": 95.01666666666667,
+      "title": "ESCROW HOLDS THE PAYMENT",
+      "caption": "The 0.012 test ETH stays in the contract after deposit. The license has not started, and recipients cannot withdraw this order\u2019s proceeds yet.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 95.01666666666667,
+      "title": "05 \u00b7 Creator confirms delivery",
+      "caption": "Payment is held in the contract. No license or co-author revenue exists yet. The creator confirms delivery.",
+      "end": 98.68559432029724,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 98.68559432029724,
+      "title": "06 \u00b7 Buyer accepts and releases payment",
+      "caption": "Acceptance is another real transaction. It starts the license and allocates platform, creator and co-author credits.",
+      "end": 103.60159420967102,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 103.60159420967102,
+      "title": "07 \u00b7 The purchased license",
+      "caption": "The real Licenses page now contains the buyer\u2019s rights and protected original download. Copyright stays with the creator.",
+      "end": 106.51666666666667,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 106.51666666666667,
+      "end": 112.51666666666667,
+      "title": "LICENSE OWNERSHIP",
+      "caption": "Acceptance records the buyer wallet, artwork and selected license on-chain. ArtGuard verifies the release before unlocking the protected original file.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 112.51666666666667,
+      "title": "07 \u00b7 The purchased license",
+      "caption": "The real Licenses page now contains the buyer\u2019s rights and protected original download. Copyright stays with the creator.",
+      "end": 114.66059422492981,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 114.66059422492981,
+      "title": "08 \u00b7 Creator earnings",
+      "caption": "Free plan commission is 10%. The remaining amount is shared 75/25. These amounts are read from the contract.",
+      "end": 118.01666666666667,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 118.01666666666667,
+      "end": 125.01666666666667,
+      "title": "REVENUE ALLOCATION",
+      "caption": "0.012 test ETH minus 10% leaves 0.0108: creator credit 0.0081, co-author credit 0.0027. Each recipient withdraws separately; gas is additional.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 125.01666666666667,
+      "title": "08 \u00b7 Creator earnings",
+      "caption": "Free plan commission is 10%. The remaining amount is shared 75/25. These amounts are read from the contract.",
+      "end": 127.3075942993164,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 127.3075942993164,
+      "title": "09 \u00b7 Co-author withdraws",
+      "caption": "The co-author signs withdraw with their own test wallet. Contract credit becomes a wallet transfer; gas is separate.",
+      "end": 134.33859419822693,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 134.33859419822693,
+      "title": "10 \u00b7 Verify directly from the EVM",
+      "caption": "This is the site\u2019s real verification component. It reads receipts, canonical blocks, contract events, license state and withdrawals without a purchase database record.",
+      "end": 144.01666666666668,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 144.01666666666668,
+      "end": 154.01666666666668,
+      "title": "VERIFY THE TRANSACTIONS",
+      "caption": "Deposit, release and withdrawal have different transaction hashes. The local EVM confirms successful receipts, canonical blocks and the active license.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 154.01666666666665,
+      "title": "10 \u00b7 Verify directly from the EVM",
+      "caption": "This is the site\u2019s real verification component. It reads receipts, canonical blocks, contract events, license state and withdrawals without a purchase database record.",
+      "end": 156.47159433364868,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 156.47159433364868,
+      "title": "11 \u00b7 Actual test results",
+      "caption": "These are the fresh commands started at the beginning of this run. Counts and exit codes come from the real test processes.",
+      "end": 162.51666666666668,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 162.51666666666668,
+      "end": 170.85000000000002,
+      "title": "READ THE ACTUAL TEST RESULTS",
+      "caption": "This recorded run passed 21 selected application unit tests and 10 EVM escrow tests: 0 failures, exit code 0. These are actual results from the saved run.",
+      "kind": "reading-pause"
+    },
+    {
+      "start": 170.85,
+      "title": "11 \u00b7 Actual test results",
+      "caption": "These are the fresh commands started at the beginning of this run. Counts and exit codes come from the real test processes.",
+      "end": 173.98992760976157,
+      "kind": "recorded-footage"
+    },
+    {
+      "start": 173.98992760976157,
+      "title": "ArtGuard \u00b7 verified on a local blockchain",
+      "caption": "Contract deployed. License purchased through escrow. Co-author paid. Selected unit and EVM tests passed.",
+      "end": 180.0,
+      "kind": "recorded-footage"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+name: Prototype checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prototype-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.22.2'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Create result directory
+        run: mkdir -p test-results
+      - name: Build and type check
+        run: npm run build 2>&1 | tee test-results/build.log
+      - name: Client unit tests
+        run: npm run test:unit -- --maxWorkers=2 2>&1 | tee test-results/client.log
+      - name: API integration tests
+        run: npm run test:api 2>&1 | tee test-results/api.log
+      - name: Local EVM contract tests
+        run: npm run test:blockchain 2>&1 | tee test-results/evm.log
+      - name: Financial model tests
+        run: npm run test:finance-model 2>&1 | tee test-results/finance.log
+      - name: Built application tests
+        run: node --import tsx --test tests/deployment.test.ts 2>&1 | tee test-results/deployment.log
+      - name: Preserve check logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: prototype-check-logs
+          path: test-results/
+          retention-days: 90
+          if-no-files-found: ignore

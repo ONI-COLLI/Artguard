@@ -1,0 +1,16 @@
+node_modules/
+.artguard-server.log
+.artguard-server-error.log
+artifacts/
+data/
+dist/
+.env
+.env.*
+!.env.example
+*.private.json
+*.private.log
+runtime/
+public-source/
+coverage/
+test-results/
+__pycache__/

@@ -1,0 +1,347 @@
+.defense-page {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #111;
+  display: grid;
+  grid-template-rows: 56px minmax(0, 1fr) 104px;
+  color: var(--text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.defense-page.defense-reviewing {
+  grid-template-rows: 56px 48px minmax(0, 1fr) 104px;
+}
+.defense-review {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: auto;
+  border-bottom: 1px solid var(--border);
+}
+.defense-review button {
+  font-size: 12px;
+  padding: 5px 13px;
+  white-space: nowrap;
+}
+.defense-top {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 34px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.defense-top > a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.04em;
+}
+.defense-top > a svg {
+  color: var(--orange);
+}
+.defense-live {
+  margin-left: auto;
+  color: var(--orange);
+}
+.defense-stage {
+  position: relative;
+  min-height: 0;
+  overflow: auto;
+}
+.defense-stage > iframe {
+  border: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #111;
+}
+.defense-stage > .defense-frame-hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.defense-caption {
+  margin: 0;
+  padding: 17px 36px;
+  gap: 0;
+  align-items: flex-start;
+  border-top: 1px solid var(--border);
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--text);
+}
+.defense-caption strong {
+  font-size: 13px;
+  color: var(--orange);
+  font-weight: 600;
+}
+.defense-caption p {
+  font-size: 20px;
+  line-height: 1.45;
+  margin: 6px 0 0;
+  max-width: 1800px;
+}
+.defense-intro {
+  margin: 6vh auto;
+  padding: 56px 68px;
+  max-width: 1280px;
+  min-height: 570px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 19px;
+}
+.defense-intro h1 {
+  font-size: clamp(42px, 4vw, 72px);
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+  margin: 0;
+}
+.defense-intro p {
+  font-size: 21px;
+  color: var(--muted);
+  max-width: 900px;
+  margin: 8px 0;
+}
+.defense-intro .primary {
+  width: auto;
+  padding: 14px 25px;
+}
+.defense-intro-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 16px 0;
+}
+.defense-intro-points > span {
+  border: 1px solid var(--border);
+  background: #191919;
+  padding: 12px 16px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.defense-complete > svg,
+.defense-complete .defense-intro-points svg {
+  color: var(--orange);
+}
+.defense-technical {
+  padding: 36px 48px;
+}
+.defense-section-heading h1 {
+  font-size: 35px;
+  letter-spacing: -0.035em;
+  margin: 8px 0;
+}
+.defense-section-heading p {
+  color: var(--muted);
+  font-size: 17px;
+  margin: 0 0 26px;
+}
+.defense-deploy-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 22px;
+}
+.defense-console {
+  padding: 24px;
+}
+.defense-console h3,
+.defense-contracts h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+}
+.defense-console h3 svg,
+.defense-contracts h3 svg {
+  color: var(--orange);
+}
+.defense-console pre {
+  font:
+    15px/1.75 Consolas,
+    monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #ccc;
+  min-height: 280px;
+  margin: 0;
+}
+.defense-contracts {
+  display: grid;
+  gap: 16px;
+}
+.defense-contracts article {
+  padding: 22px;
+}
+.defense-contracts p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.defense-contracts label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 14px 0 5px;
+}
+.defense-contracts code {
+  font:
+    14px/1.5 Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+  display: block;
+}
+.defense-job-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+.defense-job-strip article {
+  padding: 18px 23px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.defense-job-strip code {
+  font-size: 14px;
+  color: var(--orange);
+}
+.defense-job-strip span {
+  color: var(--muted);
+}
+.defense-test-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.defense-test-command {
+  display: block;
+  color: var(--orange);
+  font:
+    16px Consolas,
+    monospace;
+  margin: 0 0 24px;
+}
+.defense-test-grid pre {
+  height: 370px;
+  overflow: hidden;
+  font-size: 14px;
+}
+.defense-test-result {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 15px;
+}
+.defense-test-result strong {
+  font-size: 38px;
+}
+.defense-test-result span {
+  font-size: 16px;
+  color: var(--muted);
+}
+.defense-test-result.passed strong {
+  color: var(--orange);
+}
+.defense-test-result.failed {
+  color: #f78e89;
+}
+.defense-proof {
+  max-width: 1500px;
+  margin: 34px auto;
+  padding: 0 30px;
+}
+.defense-proof h2 {
+  font-size: 28px;
+}
+.defense-proof .chain-proof-checks {
+  font-size: 15px;
+  gap: 8px;
+}
+.defense-proof .escrow-proof-order {
+  margin-top: 18px;
+}
+.defense-proof code {
+  font-size: 14px;
+}
+.defense-proof summary {
+  font-size: 16px;
+}
+.defense-proof .panel {
+  padding: 28px 34px;
+}
+.defense-pointer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate3d(1680px, 800px, 0);
+  z-index: 99999;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #0008);
+  width: 24px;
+  height: 32px;
+  will-change: transform;
+}
+.defense-error {
+  position: absolute;
+  inset: auto 30px 25px;
+  background: #332424;
+  border: 1px solid #b75a54;
+  padding: 20px 26px;
+  border-radius: 14px;
+  z-index: 20;
+}
+.defense-error strong {
+  font-size: 22px;
+}
+.defense-error p {
+  font-size: 17px;
+  margin: 9px 0 0;
+}
+@media (max-width: 900px) {
+  .defense-top {
+    gap: 14px;
+    padding: 0 18px;
+  }
+  .defense-top > span:first-of-type {
+    display: none;
+  }
+  .defense-caption p {
+    font-size: 15px;
+  }
+  .defense-intro {
+    margin: 22px;
+    padding: 30px;
+    min-height: 480px;
+  }
+  .defense-technical {
+    padding: 24px;
+  }
+  .defense-deploy-grid,
+  .defense-test-grid {
+    grid-template-columns: 1fr;
+  }
+  .defense-test-grid pre {
+    height: 260px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .defense-page * {
+    scroll-behavior: auto !important;
+  }
+}
