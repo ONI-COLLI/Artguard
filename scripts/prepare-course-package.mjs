@@ -37,7 +37,7 @@ for(const name of rootFiles)if(existsSync(name))add(resolve(name));
 for(const name of ['Team03_FP_Demo.mp4','Team03_FP_Demo.srt','Team03_FP_Demo_evidence.json','Team03_FP_Demo_validation.json','on-chain-proof.json','canonical-receipts.json','run.json']){
  const bytes=readFileSync(resolve('deliverables/three-minute',name));files.push({path:'deliverables/three-minute/'+name,bytes,sha256:hash(bytes)});
 }
-for(const name of ['Team03_FP_Report.pdf','Team03_FP_Presentation.pdf','Team03_FP_Presentation.pptx']){
+for(const name of ['Team03_FP_Report.pdf','Team03_FP_Presentation.pdf','Team03_FP_Presentation.pptx','Team03_FP_Speech.pdf']){
  const bytes=readFileSync(join(out,name));files.push({path:'deliverables/final-project/'+name,bytes,sha256:hash(bytes)});
 }
 files.sort((a,b)=>a.path.localeCompare(b.path));

@@ -10,6 +10,9 @@ export const assumptions = {
   commission: { free: 0.10, premium: 0.05, business: 0 },
   cardProcessingRate: 0.025, gasBudgetUsdPerSale: 0.10,
   employerCostBurden: 0.175, corporateTaxPlanningRate: 0.20,
+  // Founder-operated coursework scenario: development is an unpaid, non-cash contribution.
+  // No employee hiring is committed in this base case. Opportunity cost is excluded.
+  founderCount: 4, founderMonthlyCashSalaryKzt: 0, monthlyPaidStaffKzt: 0,
   annualDiscountRate: 0.25, terminalGrowth: 0.05,
   financing: [{ month: 1, kzt: 25_000_000 }, { month: 10, kzt: 15_000_000 }],
   proposedEquity: 0.26, illustrativeExitRevenueMultiple: 2.5,
@@ -57,7 +60,7 @@ export function forecast({ demand = 1, costMultiplier = 1 } = {}, a = assumption
     const processing = (gmv + subscriptions) * a.cardProcessingRate * costMultiplier;
     const gas = sales * a.gasBudgetUsdPerSale * fx * costMultiplier;
     const hosting = 100 * year * fx * costMultiplier;
-    const salaries = (4 * [300_000, 400_000, 500_000][year - 1] + (year >= 2 ? 400_000 : 0) + (year >= 3 ? 550_000 : 0)) * (1 + a.employerCostBurden) * costMultiplier;
+    const salaries = (a.founderCount * a.founderMonthlyCashSalaryKzt + a.monthlyPaidStaffKzt) * (1 + a.employerCostBurden) * costMultiplier;
     const marketing = (month < 5 ? 100_000 : [300_000, 450_000, 600_000][year - 1]) * costMultiplier;
     const security = ((month === 4 ? 10_300 : 0) + ([16, 28].includes(month) ? 3_000 : 0) + (month >= 5 ? 2_000 / 12 : 0)) * fx * costMultiplier;
     const administration = (100 * fx + 140_000 + ([1, 13, 25].includes(month) ? (month === 1 ? 1_500 : 1_000) * fx : 0)) * costMultiplier;

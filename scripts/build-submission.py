@@ -4,7 +4,7 @@ Only the PDF is a final document. The supplied DOCX is preserved unchanged.
 Figures are native vector drawings. Numerical tables read the executable model output.
 """
 from pathlib import Path
-import json, re, hashlib, textwrap
+import json, re, hashlib, textwrap, math
 from xml.sax.saxutils import escape
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -76,9 +76,11 @@ class Diagram(Flowable):
                 c.setStrokeColor(colors.black);c.line(x1,y1,x2,y2)
         elif self.kind=='cash':
             rows=BASE['rows']; series=[('Cumulative FCF','cumulativeFcf',colors.HexColor('#666666')),('Cash after financing','closingCash',colors.HexColor('#000000'))]
-            low=-40; high=45; x0,y0=38,27; pw,ph=BW-48,self.height-48
+            values=[row[key]/1e6 for _,key,_ in series for row in rows]
+            step=20; low=math.floor(min(0,*values)/step)*step; high=math.ceil(max(step,*values)/step)*step
+            x0,y0=38,27; pw,ph=BW-48,self.height-48
             c.setFont('TNR',9);c.drawString(0,self.height-7,'KZT million')
-            for val in [-40,-20,0,20,40]:
+            for val in range(low,high+1,step):
                 y=y0+(val-low)/(high-low)*ph;c.setStrokeColor(colors.HexColor('#DDDDDD'));c.line(x0,y,x0+pw,y);c.setFillColor(colors.black);c.drawRightString(x0-5,y-3,str(val))
             for label,key,col in series:
                 c.setStrokeColor(col);c.setLineWidth(1.4); p=c.beginPath()
@@ -117,9 +119,9 @@ table(['Earlier assumption or weakness','Final Project response'],[
 ['Immediate settlement and a fixed 90/10 split','Escrow, delivery and review deadlines, co-author shares, and 10/5/0 plan commissions.'],
 ['Hardhat, PostgreSQL and a different contract described as implemented','Document the actual Anvil, SQLite and v4 escrow implementation.'],
 ['Coverage percentages and gas averages without matching evidence','Remove unsupported measurements and attach actual test and receipt evidence.'],
-['A short payback based on incomplete costs','Include salaries, security, processing of full buyer payments and downside funding needs.'],
+['A short payback based on incomplete costs','Retain unpaid founder work; include security, payment fees, tax and monthly sales ramp-up.'],
 ], [1,1.45]),source('Team comparison of the supplied Endterm summary, earlier Final draft and current repository.'),
-P('Table 1 summarises the revisions. The report retains the team\'s draft customer targets and spending assumptions for comparison. It changes the commission calculation to match the product and corrects the processing-fee base. These revisions produce a negative three-year NPV. The investment recommendation therefore becomes conditional on validating demand and reducing the cost of serving each transaction.'),
+P('Table 1 summarises the revisions. The cash forecast retains unpaid founder development, as specified in the Endterm. It includes no salaried staff or assumed future hires. It uses the product\'s blended commission, processing fees on full buyer payments, planning tax and monthly demand ramp-up. Positive cash NPV remains conditional on those demand targets and excludes the opportunity cost of founder time.'),
 P('The objectives are to document and test the prototype, evaluate market, technical, operational, financial and regulatory risks, produce reproducible three-year statements, and assess a hypothetical investment proposal. Sections 2 and 3 separate implemented controls from future safeguards. Section 4 states all planning inputs and shows their consequences. No company registration, asset purchase or real-money activity forms part of the coursework.'),
 ])
 
@@ -170,7 +172,7 @@ caption('4','Main risk matrix'),table(['ID and category','Risk','L','I','Score']
 ['R10 Regulatory','A future payment model needs additional authorisation','3','5','15'],
 ['R11 Regulatory','Personal-data breach or unsuitable hosting','2','4','8'],
 ],[1.05,2,.28,.28,.48]),source('Own qualitative assessment. L = likelihood and I = impact; score = L × I.'),
-P('Market and financing risks dominate because technical success cannot create demand. Even the base case has a negative three-year NPV. A missing original file can also break the customer experience despite a valid blockchain licence. The chain cannot reconstruct files that the operator has lost.'),
+P('Market and financing risks remain important because technical success cannot create demand. The founder-operated forecast has positive cash NPV, but this depends on unpaid labour and unvalidated demand. A missing original file can also break the customer experience despite a valid blockchain licence. The chain cannot reconstruct files that the operator has lost.'),
 P('Security papers identify recurring vulnerability classes, but using a published checklist cannot establish that this particular deployment is safe (Kushwaha et al., 2022a). The risk register therefore retains key compromise and contract defects after the listed controls. The next funding decision should depend on pilot evidence and independent review, not on the absence of failures in ten tests.'),
 ])
 
@@ -180,11 +182,11 @@ P('Digital assets require a model-specific assessment under the Law on Digital A
 P('A possible first commercial phase would use a licensed provider for tenge payments and keep only appropriate records on a public chain. That fiat path is a proposal, not implemented functionality. It would need new payment integration, chargeback handling, a revised receipt model and tests. Purchasing gas or launching on a main network is outside this educational project.'),
 P('Personal-data processing would require a defined operator, lawful purposes, an appropriate consent or other applicable basis, access controls, retention rules and review of database location and transfers. The prototype keeps account details off-chain and offers consent history and privacy requests. Wallet metadata can still be linkable to a person. Off-chain storage alone does not make it anonymous (Law No. 94-V, 2013).'),
 P('Copyright arises through creation, while a hash record supports an evidence trail. It does not grant rights over another person\'s work. A future operator needs clear licence scope, duration, territorial terms, co-author permissions, takedown and appeal procedures. Expiry can stop new downloads in ArtGuard but cannot erase copies already downloaded (Law No. 6-I, 1996; WIPO, n.d.).'),
-P('An LLP is the hypothetical legal form retained from the team draft. Founder IP assignments, a trademark strategy and third-party licences would require review before launch. The financial model uses 20% tax and a 17.5% employment-cost burden as simplified planning inputs. They are not statements of the complete statutory tax calculation. The model assumes no preferential tax treatment and does not treat a future registration or authorisation as already obtained.'),
+P('An LLP is the hypothetical legal form retained from the team draft. Founder IP assignments, a trademark strategy and third-party licences need review before launch. The model uses a simplified 20% planning tax rate. Payroll and related employment charges are zero in the unpaid-founder base case. Future paid staff require new inputs. No preferential tax treatment, registration or authorisation is assumed already obtained.'),
 ])
 
 page('3.3 Risk responses and their cost',MEM[3],[
-P('Every paid mitigation must appear in the financial model. Table 5 links security and legal measures to specific months. These figures are explicit budgeting assumptions. Procurement has not occurred and no supplier has promised these prices. Salaries also fund ordinary moderation and incident response, so their cost is not added again as a separate reserve.'),
+P('Every paid mitigation must appear in the financial model. Table 5 links security and legal measures to specific months. These are explicit budgeting assumptions. Procurement has not occurred and no supplier has promised these prices. Founders provide ordinary development, moderation and incident response without cash compensation. Their finite capacity and unpaid time remain limitations.'),
 caption('5','Mitigations included in the forecast'),table(['Measure','Planning cost','Timing and model line'],[
 ['External contract audit','USD 10,000','Month 4; security'],
 ['Two re-audits','USD 3,000 each','Months 16 and 28; security'],
@@ -195,7 +197,7 @@ caption('5','Mitigations included in the forecast'),table(['Measure','Planning c
 ],[1.2,.85,1.4]),source(),
 P('A hardware-wallet budget does not mean a multisig exists. The current v4 signer and arbiter are immutable. A compromise response therefore includes stopping new off-chain quotes, preserving evidence and assessing a replacement deployment. Existing contract rights and credits require careful migration. There is no emergency pause that can simply freeze this contract.'),
 P('The market response is a staged pilot with consenting, anonymous research participants and fictional demonstration data. Adobe Stock already supplies content-licensing terms, while Pixsy focuses on finding and addressing unauthorised image use. These are competitor categories, not partners. ArtGuard\'s proposed difference is an integrated licence, escrow and co-author audit trail. Its value to customers still needs testing (Adobe, n.d.; Pixsy, n.d.).'),
-P('Funding is also a control. The second tranche should require documented pilot retention and unit economics, rather than a transaction count created by demo accounts. If these milestones fail, management should reduce scope, postpone hires or stop the hypothetical project. Those actions change the cost and growth assumptions and require a new model run. They cannot be claimed to solve a funding shortfall automatically.'),
+P('Funding is also a control. Any later tranche should require documented pilot retention and unit economics rather than transaction counts created by demo accounts. If milestones fail, management should reduce scope or stop the hypothetical project. No paid hiring is included in this base case. Any future employee or founder compensation requires a new cash forecast and funding decision.'),
 ])
 
 page('4 Detailed financial plan',MEM[2],[h('4.1 Forecast assumptions and units'),
@@ -205,7 +207,7 @@ caption('6','Demand and subscription anchors'),table(['Monthly level','Month 5',
 ],[1.2,.6,.7,.7,.7]),source('Demand targets retained from the team draft; no survey or actual customer adoption is claimed.'),
 P('Expected volumes interpolate linearly between anchors. Fractional monthly values are forecast averages. Average licence price is USD 30. Premium costs USD 10 and Business USD 50 per month. The assumed shares of sales value are 50% Free, 30% Premium and 20% Business. The effective commission is therefore 0.50 × 10% + 0.30 × 5% + 0.20 × 0% = 6.5%. Subscriber counts refer to creators, who can also be buyers.'),
 P('Processing costs are 2.5% of gross licence payments plus subscriptions, not 2.5% of the platform\'s commission alone. Gas receives a USD 0.10 allowance per sale. Hosting is USD 100 monthly in Year 1, twice that in Year 2 and three times that in Year 3. Promotion revenue is excluded from the base forecast because uptake has not been validated. The implemented USD 5 seven-day promotion remains a possible upside, not a necessary source of forecast profit.'),
-P('Four founders receive monthly gross salaries of KZT 300,000, 400,000 and 500,000 across the three years. A KZT 400,000 community role begins in Month 13, followed by a KZT 550,000 developer in Month 25. A 17.5% planning burden applies to gross salaries. Marketing is KZT 100,000 before launch and KZT 300,000/450,000/600,000 monthly thereafter. Administration includes USD 100 tools, KZT 140,000 other monthly costs and the legal reviews in Table 5.'),
+P('The founders develop and operate the project themselves without salary, consistent with the Endterm. Cash payroll is KZT 0 throughout the forecast; no community-manager or developer hire is assumed. Unpaid founder time is a non-cash contribution whose opportunity cost is excluded. Marketing remains KZT 100,000 before launch and KZT 300,000/450,000/600,000 monthly thereafter. Administration includes USD 100 tools, KZT 140,000 other monthly costs and the legal reviews in Table 5.'),
 ])
 
 ann=BASE['annual']
@@ -223,18 +225,18 @@ caption('8','Projected cash flow statement in KZT thousand'),table(['Item','Year
 ])
 
 page('4.3 Break even and investment value',MEM[2],[
-P(f'Table 9 places operating break even in Month {MET["firstPositiveEbitdaMonth"]}. This is an operating milestone, not recovery of all development losses. Subsequent audit costs or hiring can again make a month negative. Simple payback does not occur within the 36-month forecast, and no unsupported date beyond that horizon is claimed.'),
+P(f'Table 9 places the first positive monthly EBITDA in Month {MET["firstPositiveEbitdaMonth"]}. This is distinct from cumulative recovery of earlier cash costs in Month {MET["simplePaybackMonth"]}. A later audit can still make an individual month negative. Annual discounted operating FCF becomes cumulatively positive by the end of Year 2. These are forecast milestones, not observed results.'),
 P('The annual discount rate is 25%, within the required venture range of 20–30%, to reflect early demand uncertainty, concentrated execution risk and illiquidity. The model uses year-end discounting of annual free cash flow. Initial development outflows are already in Year 1. Equity financing is excluded from project FCF, so subtracting the KZT 40 million raise again would double count funding.'),
 caption('9','Base-case investment metrics'),table(['Metric','Result'],[
 ['Three-year project NPV at 25%',f'KZT {money(MET["npvThreeYears"])} million'],
 ['Maximum cumulative cash need',f'KZT {money(MET["peakNeed"])} million in Month {MET["troughMonth"]}'],
-['Simple and discounted payback','Neither reached within 36 months'],
+['Simple cumulative cash recovery',f'Month {MET["simplePaybackMonth"]}; discounted annual FCF positive by end of Year 2'],
 ['Cash after financing in Month 36',f'KZT {money(MET["endingCash"])} million'],
 ['Optional terminal value, g = 5%',f'KZT {money(MET["terminalValue"])} million at end of Year 3'],
 ['NPV including terminal value',f'KZT {money(MET["npvWithTerminal"])} million'],
 ],[1.35,1.15]),source(),
 Diagram('cash',140),P('Figure 3. Cumulative project FCF and financed cash balance','cap'),source(),
-P('The optional terminal value assumes Year 3 FCF grows by 5% perpetually. It is a sensitivity assumption, not observed business value. Even this extension does not produce a positive base-case NPV. Figure 3 shows positive cash despite the project\'s negative NPV. The appropriate response is to revisit unit economics and customer evidence, rather than relabel financing as earned income.'),
+P('The optional terminal value assumes Year 3 FCF grows by 5% perpetually. It is a sensitivity assumption, not observed business value. The main decision uses the finite three-year cash NPV without this large extension. Figure 3 separates cumulative operating FCF from cash including financing. Positive cash NPV depends on unpaid founder work and the assumed customers; it does not establish a salary-inclusive economic return.'),
 ])
 
 scens=[MODEL['scenarios'][x] for x in ['base','demand','costs','combined']]
@@ -246,11 +248,11 @@ caption('10','Sensitivity of NPV, payback and funding need'),table(['Metric','Ba
 ['Month of maximum need']+[str(x['metrics']['troughMonth']) for x in scens],
 ['Extra above KZT 40m']+[money(x['metrics']['extraFunding']) for x in scens],
 ['First positive EBITDA month']+[str(x['metrics']['firstPositiveEbitdaMonth'] or 'Not reached') for x in scens],
-['Payback by Month 36']+['No']*4,
+['Cash recovery month']+[str(x['metrics']['simplePaybackMonth'] or 'Not reached') for x in scens],
 ],[1.45,.6,.6,.6,.6]),source('Own model. A: customers −30%; B: cash operating costs +20%; C: both changes.'),
-P(f'The base funding requirement is KZT {money(MET["peakNeed"])} million. Lower demand raises the requirement to KZT {money(scens[1]["metrics"]["peakNeed"])} million, while higher costs require KZT {money(scens[2]["metrics"]["peakNeed"])} million. The combined case needs KZT {money(scens[3]["metrics"]["peakNeed"])} million. A KZT 40 million raise cannot finance those downside plans unchanged.'),
-P('Management responses would include deferring hires, narrowing the product scope and delaying launch. The current stress table does not assume that these responses happen for free or preserve customer growth. Each revised strategy needs an explicit new scenario. A negative projected cash balance means an unfunded plan, not permission to spend money the company does not have.'),
-P('A subjective risk-weighted estimate can support discussion, but cannot replace evidence. Using the draft weights of 50% base, 25% lower demand, 15% higher costs and 10% combined yields a negative expected three-year NPV. These weights are judgemental and do not make the forecast statistically reliable. The shared result across the scenarios is that customer growth and the recurring cost base must be validated before a full funding commitment.'),
+P(f'The base peak cash need is KZT {money(MET["peakNeed"])} million. Lower demand requires KZT {money(scens[1]["metrics"]["peakNeed"])} million, higher costs KZT {money(scens[2]["metrics"]["peakNeed"])} million and the combined case KZT {money(scens[3]["metrics"]["peakNeed"])} million. Each is below the retained KZT 40 million proposal. Its size should therefore be reconsidered for a founder-operated pilot.'),
+P('The stress cases preserve the unpaid-founder operating model. They do not test future paid staffing or founders leaving the project. Positive scenario NPV is conditional on that labour being available. Introducing cash compensation, lower retention or additional compliance costs requires explicit inputs and a new run; the forecast must not treat those resources as economically free.'),
+P('A subjective risk-weighted estimate can support discussion but cannot replace evidence. The draft weights of 50% base, 25% lower demand, 15% higher costs and 10% combined now yield a positive weighted cash NPV. Those weights are judgemental, not statistical probabilities. Customer growth, unpaid founder availability and the recurring cost base must still be tested before a funding commitment.'),
 P('No terminal value is credited to scenarios with negative Year 3 FCF. This convention avoids applying a perpetual-growth formula to a loss-making year and reporting an implausible asset value. It also shows why a profitable last month alone does not establish a sustainable full-year business.'),
 ])
 
@@ -262,13 +264,13 @@ for label,key in uses:
     amount=sum((x['gas']+x['processing'] if key is None else x[key]) for x in upto)
     useRows.append([label,money(amount),f'{amount/gross:.1%}'])
 page('4.5 Use of funds and runway',MEM[2],[
-P('The hypothetical raise remains KZT 40 million, with KZT 25 million in Month 1 and KZT 15 million in Month 10. Table 11 shows gross spending to the base-case cash trough in Month 28. The shares refer to spending, not directly to the investment. Customer receipts finance part of those costs. Keeping these bases separate prevents a use-of-funds chart from implying that the same capital is spent twice.'),
-caption('11','Spending to Month 28 in KZT million'),table(['Use','Amount','Share of spend'],useRows+[
+P(f'The earlier KZT 40 million proposal is retained for comparison: KZT 25 million in Month 1 and KZT 15 million in Month 10. Table 11 shows spending to the cash trough in Month {MET["troughMonth"]}. No payroll is paid. Shares refer to spending; customer receipts finance part of it. The proposed raise is substantially greater than the corrected pilot cash need and should be resized.'),
+caption('11',f'Spending to Month {MET["troughMonth"]} in KZT million'),table(['Use','Amount','Share of spend'],useRows+[
 ['Gross spending',money(gross),'100%'],['Less platform revenue',money(earned),'Not a funding tranche'],['Cumulative cash need',money(MET['peakNeed']),'Net of receipts'],['Reserve within KZT 40m',money(40e6-MET['peakNeed']),'Remaining buffer'],
 ],[1.7,.65,1.1]),source(),
-P(f'With no revenue, the full KZT 40 million covers approximately {MET["noRevenueRunwayCompleteMonths"]} complete months of the model\'s fixed costs. This runway measure assumes both tranches arrive and removes payment-processing and gas costs because there are no sales. In the base case the minimum financed balance is KZT {money(MET["minFinancedCash"])} million. The model does not count locked customer escrow deposits as available company funding.'),
-P('The conditional second tranche creates a further execution risk. The cash forecast assumes it arrives in Month 10. If the milestone fails, the company cannot continue the same spending plan simply because the total proposed raise is KZT 40 million. The finance lead must run a no-second-tranche case before committing to hires or an audit contract.'),
-P('The earlier draft showed a much shorter payback and lower funding need. The revised model retains its demand anchors and salaries, but applies a 6.5% blended commission and processing fees to full buyer payments. These corrections explain the weaker result. The frozen planning exchange rate is also exposed as a model assumption, while a separate currency-risk scenario remains sensible future work.'),
+P(f'With no revenue, the full KZT 40 million covers all {MET["noRevenueRunwayCompleteMonths"]} months in this model\'s horizon; the exact later exhaustion date is not forecast. This measure assumes both tranches arrive and removes processing and gas costs because there are no sales. The base minimum financed balance is KZT {money(MET["minFinancedCash"])} million. Locked customer escrow is never company funding.'),
+P('The forecast assumes both proposed tranches arrive. A smaller staged commitment should be evaluated against the corrected monthly cash needs, the first tranche timing and an explicit reserve. Retaining the old proposal does not establish that KZT 40 million is necessary. No new investment amount or equity bargain is invented in this correction.'),
+P('The corrected model restores unpaid founder development from the Endterm. Earlier added salaries and assumed hires are removed; other forecast inputs remain unchanged. It still applies a 6.5% blended commission, processing on full buyer payments and planning tax. This explains the revised cash result without claiming that founder time has no economic cost.'),
 ])
 
 page('5 Investment pitch',MEM[0],[h('5.1 Executive summary'),
@@ -276,7 +278,7 @@ P('ArtGuard addresses a practical licensing problem. A creator needs to document
 P('The working prototype combines a catalogue, project uploads, per-project co-author shares, expiring or perpetual licences, subscription tiers, promotion payments and escrow. Its local demonstration records a buyer deposit, seller delivery, acceptance, an active licence and a co-author withdrawal. Ten EVM escrow tests passed. These are technical milestones using fictional identities, not commercial traction.'),
 P('The proposed first market is independent visual creators and small business buyers in Kazakhstan. No verified market-size estimate or customer survey is claimed. Adobe Stock demonstrates an established licensing category, Pixsy addresses infringement, and NFT research discusses a different token-market model (Adobe, n.d.; Pixsy, n.d.; Bhujel &amp; Rahulamathavan, 2022). ArtGuard must test whether its combined workflow provides enough value to justify an additional service.'),
 P('Revenue would come from creator subscriptions, plan-dependent sales commissions and optional promotion. Free costs USD 0 with a 10% fee, Premium USD 10 with 5%, and Business USD 50 with 0%. The forecast assumes a 6.5% weighted fee. It excludes unvalidated promotion demand and uses an average licence price of USD 30. Payment processing, support, security and original-file storage remain material costs.'),
-P(f'The proposal requests KZT 40 million in two tranches for an illustrative 26% participation interest. The base case reaches KZT {money(ann[2]["revenue"])} million revenue in Year 3, but three-year NPV is KZT {money(MET["npvThreeYears"])} million and payback exceeds the forecast horizon. The implied investment return under an assumed exit is below the 25% hurdle. The current terms therefore require revision or stronger evidence.'),
+P(f'The retained proposal is KZT 40 million in two tranches for an illustrative 26% interest. The unpaid-founder case reaches KZT {money(ann[2]["revenue"])} million Year 3 revenue and KZT {money(MET["npvThreeYears"])} million three-year cash NPV. Cumulative cash recovery is Month {MET["simplePaybackMonth"]}. Peak cash need is only KZT {money(MET["peakNeed"])} million, so the original raise should be reconsidered rather than presented as necessary.'),
 P('The recommended decision is a staged validation project, not an unconditional investment commitment. The first work should test creator retention, buyer willingness to pay, expected dispute cost and unit contribution after payment processing. Only a reviewed model that survives credible downside cases should support the next hypothetical round. No actual investment is solicited by this coursework.'),
 ])
 
@@ -287,9 +289,9 @@ caption('12','Illustrative investment terms and their limits'),table(['Item','Pr
 ['Implied valuation','KZT 153.85m post-money and KZT 113.85m pre-money.'],
 ['Exit assumption','2.5 × Month 36 annualised revenue, plus cash; an assumption, not a quoted market multiple.'],
 ['Illustrative outcome',f'{MET["investorMoic"]:.2f}× invested capital and {MET["illustrativeInvestorIrr"]:.1%} annual IRR using the two actual tranche dates.'],
-['Decision','The illustrative IRR is below 25%. Reprice, reduce costs or validate a stronger revenue case.'],
+['Decision','Positive cash case with unpaid founders; resize the raise and validate demand and labour capacity.'],
 ],[.8,2]),source(),
-P('Table 12 separates investor IRR from project NPV. The exit multiple is uncertain for a small unprofitable company. Downside financing requires a dilution or debt model. A strategic sale or later investor buy-out is an uncommitted exit option.'),
+P('Table 12 separates investor IRR from project NPV. The exit multiple is unverified and no sale is committed. The illustrated return exceeds the 25% hurdle in the base case but weakens with lower demand. The KZT 40 million proposal also exceeds the corrected cash need. Funding size, ownership terms and any paid staffing require separate evaluation.'),
 caption('13','Team responsibilities'),table(['Member','Role and review responsibility'],[[m['name'],m['role']+'; '+m['area']] for m in CONFIG['members']],[1,1.7]),source('Team roles confirmed by the project representative. Each student confirms their own actual contribution separately.'),
 P('The technical lead must explain quote validation, state transitions and withdrawals. The finance lead must reproduce the model and defend its assumptions. The operations lead owns the risk and regulatory discussion. The team lead connects these findings to the investment decision. Responsibilities do not establish who wrote every line of code: individual GitHub commits and self-evaluations must document the actual work.'),
 ])
@@ -297,10 +299,10 @@ P('The technical lead must explain quote validation, state transitions and withd
 page('6 Conclusion',MEM[0],[
 P('The prototype demonstrates a complete local blockchain use case. A creator registers exact file and terms fingerprints, a buyer deposits test ETH, and the contract enforces delivery and review conditions. Acceptance activates a licence and credits recipients. A separate withdrawal transfers earnings. Successful receipts, canonical blocks, events and contract state can be inspected without treating an accounting database row as proof of payment.'),
 P('This technical result has clear limits. The local Anvil operator controls the network. Demo wallets use a custodial test signer. A trusted manager resolves disputes through the arbiter address. File delivery, account controls and original storage remain server responsibilities. A hash identifies bytes and a registration claim; it does not decide copyright ownership or recover a lost original. The report therefore does not claim a production-ready decentralised rights system.'),
-P(f'The financial review materially changes the earlier investment story. Applying the actual plan commissions and processing full buyer payments reduces Year 3 platform revenue to KZT {money(ann[2]["revenue"])} million and operating FCF to KZT {money(ann[2]["fcf"])} million. Three-year NPV at 25% is KZT {money(MET["npvThreeYears"])} million. Payback does not occur within three years. The base cash requirement is KZT {money(MET["peakNeed"])} million, leaving a limited buffer in a KZT 40 million funding plan.'),
-P('Both required pessimistic scenarios create larger financing needs than the proposed raise. The combined scenario is particularly severe. A conditional tranche protects an investor only if management also stops or changes spending when milestones fail. It does not remove the cost of an unsuccessful pilot. These findings connect the software, risk matrix and financial statements to the time value of money and the risk–return trade-off.'),
+P(f'The financial correction restores unpaid founder work and removes unapproved employee hires. Year 3 platform revenue is KZT {money(ann[2]["revenue"])} million and operating FCF KZT {money(ann[2]["fcf"])} million. Three-year cash NPV at 25% is KZT {money(MET["npvThreeYears"])} million, cumulative cash recovery is Month {MET["simplePaybackMonth"]}, and base peak cash need is KZT {money(MET["peakNeed"])} million. These results exclude the opportunity cost of founder time.'),
+P('The specified downside cases now retain positive cash NPV and require less than the proposed KZT 40 million. This is conditional on unvalidated customers and continued unpaid work. A large financed cash balance does not prove that the raise is necessary. The corrected forecast supports resizing the funding proposal and separately testing future founder or employee pay.'),
 P('The appropriate next step is an evidence-led pilot and a revised investment decision. Validate buyer and creator retention, inspect the contribution after payment fees and support, obtain independent security and legal reviews, and model any reduced scope or repriced funding terms. The current prototype is a suitable teaching demonstration, while the commercial case remains conditional.'),
-P('The team should support a hypothetical investment only after those conditions are met. For this course, no company needs to be registered, no real funds used and no token issued. Each member must understand the code, calculations and limitations, disclose the AI assistance, document their actual contribution and complete the submission-access checks. A well-supported negative NPV is a valid analytical result and should not be replaced by an invented success claim.'),
+P('The team should support a hypothetical investment only after those conditions are met. For this course, no company needs registration, real funds or a token. Each member must understand the code, calculations and limitations, disclose AI assistance and document actual contribution. Positive cash NPV under unpaid-founder assumptions is a conditional model result, not verified profitability or a guaranteed investment return.'),
 ])
 
 # References are generated from verified DOI metadata and primary official sources.
@@ -353,14 +355,14 @@ for year in [1,2,3]:
     caption(f'A{year}',f'Monthly base forecast Year {year} in KZT thousand'),
     table(['M','Sales','Revenue','Costs','FCF','Cash'],[[x['month'],f'{x["sales"]:.0f}',k(x['revenue']),k(x['costs']),k(x['fcf']),k(x['closingCash'])] for x in rows],[.35,.6,1,1,1,1],small=True),source(),
     P('Forecast averages can be fractional before rounding. No opening assets, debt or capitalised development are assumed. All pre-launch expenses enter operating FCF. Cash includes the scheduled equity tranches, while revenue does not. The full unrounded 36-month output is financial-model.json in this package.'),
-    P('Reproduction: node scripts/finance-model.mjs artifacts/submission-review/financial-model.json. Validation: npm run test:finance-model. Five tests check tier weighting, the gross-payment processing base, cash reconciliation, downside behaviour and the two-tranche IRR. These numerical tests verify implementation consistency; they do not validate customer forecasts.'),
+    P('Reproduction: node scripts/finance-model.mjs artifacts/submission-review/financial-model.json. Validation: npm run test:finance-model. Six tests check unpaid payroll, tier weighting, processing, cash reconciliation, downside behaviour and two-tranche IRR. These verify calculation consistency, not actual demand. Founder labour is a non-cash contribution; future compensation needs a new scenario.'),
     ],label='Appendix A')
 
 page('Appendix B Formulas and valuation',MEM[2],[
 h('Project cash flows'),P('Commission = sales × average licence price × 6.5%. Subscription revenue = Premium creators × USD 10 + Business creators × USD 50, converted at the frozen planning rate. Processing = 2.5% × (gross licence payments + subscriptions). Operating FCF = revenue − cash costs − planning tax. Financing is separate.'),
 h('NPV and terminal value'),P('NPV = FCF<sub>1</sub>/1.25 + FCF<sub>2</sub>/1.25<super>2</super> + FCF<sub>3</sub>/1.25<super>3</super>. No additional initial investment is subtracted because build expenses already appear in Year 1. Optional TV = max(0, Year 3 FCF) × 1.05 / (0.25 − 0.05). Terminal-value NPV adds TV/1.25<super>3</super>.'),
 h('Investor calculation'),P(f'The proposed 26% interest implies post-money value 40/0.26 = KZT 153.85 million. The illustrative exit value is 2.5 × Month 36 revenue × 12 + closing cash = KZT {money(MET["exitEquityValue"])} million. The multiple is an assumption. Investor proceeds are KZT {money(MET["investorExit"])} million. IRR solves −25 −15/(1+r)<super>0.75</super> + proceeds/(1+r)<super>3</super> = 0, with all figures in KZT million.'),
-P('This calculation gives the same final 26% after both tranches and assumes no later dilution, debt, dividends or transaction costs. It is not a promise of return. Downside cases need additional financing, so their investor returns cannot be inferred without modelling the new capital terms.'),
+P('This illustration gives the same final 26% after both tranches and assumes no later dilution, debt, dividends or transaction costs. It is not a promise of return. The specified downside cases require no capital beyond KZT 40 million under unpaid payroll; future paid staffing, a resized raise or new capital terms need a separate valuation.'),
 h('Tax and timing limits'),P('The simplified model carries operating losses forward and applies the planning 20% rate only after those losses are used. It is not a tax filing or advice on eligibility. Annual NPV uses year-end aggregation; the investor calculation uses explicit tranche dates. Different timing conventions must not be mixed without explanation.'),
 h('Unit contribution and volume break even'),
 P('At the assumed tier mix, a licence contributes USD 30 × (6.5% − 2.5%) − USD 0.10 = USD 1.10, or KZT 492.73, before fixed costs. Premium and Business monthly contributions after processing are KZT 4,367.42 and KZT 21,837.08. Required licence sales = max(0, fixed costs − subscription contributions) / 492.73. Fixed costs exclude gas and processing. Apply the subscriber base and cost level of the same month.'),

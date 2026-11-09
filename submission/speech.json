@@ -1,0 +1,89 @@
+{
+  "pages": [
+    [
+      {
+        "slide": 1,
+        "heading": "Slide 1 — Title   Assan Dairabaev · ~0:20",
+        "body": "Good morning. We are Team 3: Assan Dairabaev, Demezhan Kaidar, Yevgeniy Tyo and Kalybek Zhumabekov, group SE-2533. Our project is ArtGuard. In this final stage we built a local prototype, assessed the risks and tested whether ArtGuard could be an investment. This is an educational simulation: all customers and figures are fictional, and we used only test ETH."
+      },
+      {
+        "slide": 2,
+        "heading": "Slide 2 — The licensing problem   Assan Dairabaev · ~0:35",
+        "body": "Let's start with the problem. Creators need clear evidence of their work and of the terms they agreed to. Buyers need a licence and a reliable delivery process. Co-authors need a traceable record of their shares. Research on blockchain rights management supports these design needs (Ciriello et al., 2023; Frattolillo, 2024). Our first proposed market is visual creators and small- business buyers in Kazakhstan. To be clear: demand and willingness to pay are not yet validated. That is one of our main conclusions."
+      },
+      {
+        "slide": 3,
+        "heading": "Slide 3 — Architecture   Demezhan Kaidar · ~0:35",
+        "body": "Here is what we actually built. The front end is React with a wallet: users fill in forms and sign transactions. The back end is Express with SQLite: it stores accounts, price quotes and protected files. The blockchain layer is a local Anvil EVM: it stores hashes, holds escrow and issues licences to wallets. Files never go on-chain. One honest limitation: the local operator controls Anvil, and the built-in demo wallets use a restricted custodial signer on the server."
+      },
+      {
+        "slide": 4,
+        "heading": "Slide 4 — Escrow   Demezhan Kaidar · ~0:40",
+        "body": "The key design idea is that escrow separates payment from acceptance. First, the creator registers fingerprints of the file and the terms. Second, the buyer locks the exact quoted amount. Third, the seller confirms delivery within 72 hours. Fourth, the buyer has 24 hours to accept or dispute. Fifth, acceptance starts the licence and credits each party's share. Sixth, each recipient withdraws in a separate transaction. A dispute blocks the normal release, and if it stays unresolved, a refund becomes possible after seven days. The timers only make transactions possible; nothing moves automatically."
+      },
+      {
+        "slide": 5,
+        "heading": "Slide 5 — Demo video   Demezhan Kaidar · ~0:15 + 3:00 video",
+        "body": "Now our three-minute recording of a real local run: deployment, an escrow purchase, the licence and the payout, and then the test results. The video shows 21 selected application tests and 10 EVM escrow tests. [Play video]"
+      }
+    ],
+    [
+      {
+        "slide": 6,
+        "heading": "Slide 6 — Security   Kalybek Zhumabekov · ~0:35",
+        "body": "Thank you. Here are the controls that actually exist. Against reentrancy, we clear the credit before the transfer and use a nonReentrant guard. Against tampered or replayed quotes, we use EIP-712 signatures with buyer, expiry and quote ID checks. Against unauthorised settlement, every step checks the wallet and the state. Some risk remains: the trusted signer could authorise bad terms, and a compromised arbiter would affect disputes. We do not claim a multisig, an emergency pause or signer rotation. An independent audit is still planned."
+      },
+      {
+        "slide": 7,
+        "heading": "Slide 7 — Market alternatives   Kalybek Zhumabekov · ~0:25",
+        "body": "Who else is in this space? Stock licensing services focus on content discovery and usage terms. Infringement services such as Pixsy find unauthorised use. NFT marketplaces focus on token trading. ArtGuard's question is different: does an escrow workflow with a wallet-bound licence, and no token, add useful assurance? These are reference categories, not our clients or partners."
+      },
+      {
+        "slide": 8,
+        "heading": "Slide 8 — Main risks   Kalybek Zhumabekov · ~0:40",
+        "body": "These are the risks that matter for an investor. The two highest scores, 20 each, are weak demand and a funding shortfall. Our responses are to validate retention and willingness to pay, and to stage the funding. Next, with a score of 15 each, come signer or arbiter compromise and regulatory classification. Under the Law on Digital Assets, the Law on Personal Data and possibly the AIFC rules, a real commercial launch would need a legal review specific to this model. Finally, false authorship and delivery disputes need a clear evidence, takedown and appeal process."
+      },
+      {
+        "slide": 9,
+        "heading": "Slide 9 — Revenue model   Yevgeniy Tyo · ~0:30",
+        "body": "Now the finances. Creators choose a plan. Free costs nothing but carries a 10% sales commission. Premium is 10 dollars a month with 5% commission. Business is 50 dollars a month with no commission. There is also a 5-dollar, seven-day promotion, but the base forecast includes no promotion revenue until demand is proven."
+      },
+      {
+        "slide": 10,
+        "heading": "Slide 10 — Assumptions   Yevgeniy Tyo · ~0:30"
+      },
+      {
+        "slide": 11,
+        "heading": "Slide 11 — Three-year forecast   Yevgeniy Tyo · ~0:30"
+      }
+    ],
+    [
+      {
+        "slide": 12,
+        "heading": "Slide 12 — NPV   Yevgeniy Tyo · ~0:30"
+      },
+      {
+        "slide": 13,
+        "heading": "Slide 13 — Sensitivity   Yevgeniy Tyo · ~0:30"
+      },
+      {
+        "slide": 14,
+        "heading": "Slide 14 — Funding terms   Assan Dairabaev · ~0:35"
+      },
+      {
+        "slide": 15,
+        "heading": "Slide 15 — Team   Assan Dairabaev · ~0:15",
+        "body": "Our roles: Demezhan is CEO and led architecture and security; I am CFO and prepared the introduction and the pitch; Yevgeniy is CTO and built the financial model; Kalybek is COO and covered risk and regulation. Each of us documents our own commits."
+      },
+      {
+        "slide": 16,
+        "heading": "Slide 16 — Conclusion   Kalybek Zhumabekov · ~0:25"
+      },
+      {
+        "slide": 17,
+        "heading": "Slides 17–18 — AI disclosure and references   Assan Dairabaev · ~0:15",
+        "body": "Finally, we used Codex with GPT-6.1 Sol for substantial help with code, tests, the model and editing. Every team member has reviewed the work and can explain it. Our references are on the last slide and in the report. Thank you. We are happy to take your questions."
+      }
+    ]
+  ]
+}

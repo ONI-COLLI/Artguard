@@ -9,9 +9,11 @@ demonstration tooling, captions and video editing, report editing, reference
 metadata checks, financial-model implementation and recalculation, figures and
 presentation preparation. This was substantial assistance, not grammar-only work.
 
-The revised forecast retains stated demand and salary anchors from the supplied
-draft, adds an explicit 50/30/20 sales-value plan mix and corrects processing fees
-to the full buyer payment. Its assumptions and conclusions require the team's
+The revised forecast uses an explicit 50/30/20 sales-value plan mix and processing
+fees on the full buyer payment. The correction of 9 November restores the
+Endterm's unpaid founder labour: cash salaries and assumed employee hires are
+zero. Founder opportunity cost is excluded and future compensation needs its own
+scenario. Its assumptions and conclusions require the team's
 independent review before submission. Do not claim calculations were independently
 checked by students until that review has occurred.
 

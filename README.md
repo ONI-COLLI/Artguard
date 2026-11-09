@@ -18,6 +18,7 @@ local test ETH.
 | --- | --- |
 | Report | [Team03_FP_Report.pdf](deliverables/final-project/Team03_FP_Report.pdf): 15 main-text pages; title, contents, references and appendices are separate |
 | Presentation | [PDF for Moodle](deliverables/final-project/Team03_FP_Presentation.pdf) · [Editable PowerPoint](deliverables/final-project/Team03_FP_Presentation.pptx) |
+| Defence speech | [English speaker text](deliverables/final-project/Team03_FP_Speech.pdf), with financial figures from the same unpaid-founder model |
 | Demo video | [Download Team03_FP_Demo.mp4](deliverables/three-minute/Team03_FP_Demo.mp4): exactly 3:00 with English on-screen explanations |
 | Required university OneDrive sharing URL | **Pending upload by the team.** The GitHub MP4 is a convenient copy, not the required institutional sharing URL. |
 | Video evidence | [Saved run and test scope](deliverables/three-minute/Team03_FP_Demo_evidence.json) · [Media validation](deliverables/three-minute/Team03_FP_Demo_validation.json) · [English captions](deliverables/three-minute/Team03_FP_Demo.srt) |
@@ -194,8 +195,13 @@ not replace the required GitHub repository or institutional video link.
 `npm run finance:model` reproduces the educational three-year forecast;
 `npm run test:finance-model` checks its calculations. The frozen **447.94 KZT/USD**
 planning rate is separate from live UI conversions. Test ETH and locked customer
-escrow funds are not real revenue or startup capital. Assumptions and negative
-NPV remain explicit in the report and [model snapshot](submission/financial-model.json).
+escrow funds are not real revenue or startup capital. The Endterm's unpaid founder
+development is preserved: cash payroll is zero, with no employee hiring assumed.
+The correction of 9 November removes the previously added salaries; other forecast
+inputs remain unchanged. Three-year cash NPV is KZT 24.97m, cumulative cash recovery
+is Month 19 and peak cash need is KZT 7.52m. These are conditional estimates that
+exclude founder opportunity cost, not proven demand or guaranteed returns.
+See the report and [model snapshot](submission/financial-model.json).
 
 AI assistance: **Codex, GPT-6.1 Sol**, including code, tests, demonstration tooling,
 captions, report editing and financial-model work. See [AI Disclosure](docs/AI_DISCLOSURE.md).

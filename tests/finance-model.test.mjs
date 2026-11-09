@@ -1,6 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { assumptions, effectiveCommission, forecast } from '../scripts/finance-model.mjs';
+
+test('the founder-operated base case pays no salaries or unapproved future hires', () => {
+  const base = forecast();
+  assert.equal(assumptions.founderMonthlyCashSalaryKzt, 0);
+  assert.equal(assumptions.monthlyPaidStaffKzt, 0);
+  assert.ok(base.rows.every(row => row.salaries === 0));
+  // An explicitly paid scenario must still include its cash compensation and burden.
+  const paid = forecast({}, { ...assumptions, founderMonthlyCashSalaryKzt: 300_000 });
+  assert.equal(paid.rows[0].salaries, 1_410_000);
+  assert.ok(paid.metrics.npvThreeYears < base.metrics.npvThreeYears);
+});
 test('forecast respects the actual 10/5/0 commission tiers and the volume-weighted mix', () => {
   assert.ok(Math.abs(effectiveCommission() - 0.065) < 1e-12);
   assert.equal(effectiveCommission({ ...assumptions, salesVolumeMix: { free: 0, premium: 0, business: 1 } }), 0);
