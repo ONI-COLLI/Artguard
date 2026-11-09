@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,6 +18,8 @@ import { Button, PageHeading } from '../components/ui';
 import { BlockchainProof } from '../components/blockchain-proof';
 import { EscrowProof } from '../components/escrow-proof';
 import { BlockchainSandbox } from '../components/blockchain-sandbox';
+import '../components/technical-code.css';
+const TechnicalCodeWalkthrough = lazy(() => import('../components/technical-code'));
 
 const steps = [
   {
@@ -112,6 +114,18 @@ const steps = [
   },
 ];
 export default function BlockchainDemonstration() {
+  const [params, setParams] = useSearchParams();
+  const technical = params.get('view') === 'code';
+  function selectView(code: boolean) {
+    setParams(
+      (p) => {
+        if (code) p.set('view', 'code');
+        else p.delete('view');
+        return p;
+      },
+      { replace: true },
+    );
+  }
   const { user } = useData();
   const allowed = !!user?.isAdmin && user.emailVerified;
   const [step, setStep] = useState(0),
@@ -148,116 +162,171 @@ export default function BlockchainDemonstration() {
           </div>
         }
       />
-      <section className="chain-demo-walkthrough" aria-labelledby="chain-demo-flow-title">
-        <div className="panel escrow-lifecycle">
-          <h2>New purchases use escrow</h2>
-          <ol>
-            <li>
-              <strong>Deposit</strong>
-              <span>
-                The buyer pays the contract. Funds are held; no license or revenue credit is issued.
-              </span>
-            </li>
-            <li>
-              <strong>Delivery · 72 hours</strong>
-              <span>
-                The seller confirms the file is ready. Without delivery, a full refund becomes
-                available.
-              </span>
-            </li>
-            <li>
-              <strong>Review · 24 hours</strong>
-              <span>
-                The buyer inspects the file and accepts, or opens a dispute. After the review
-                deadline, anyone can submit a release transaction for an undisputed order.
-              </span>
-            </li>
-            <li>
-              <strong>Dispute · 7 days</strong>
-              <span>
-                A manager acts through the platform arbiter to release or refund. If no decision
-                arrives, a refund becomes available.
-              </span>
-            </li>
-            <li>
-              <strong>Settlement</strong>
-              <span>
-                Release starts the license and credits the seller, co-authors and commission. A
-                refund credits the buyer’s separate refund balance. Each recipient withdraws with
-                their own wallet.
-              </span>
-            </li>
-          </ol>
-          <p className="field-hint">
-            Timers enable actions. They do not send transactions by themselves. The platform arbiter
-            is a trusted dispute resolver in this local prototype.
-          </p>
-        </div>
-        <div className="chain-demo-section-heading">
-          <h2 id="chain-demo-flow-title">The current escrow license flow</h2>
-          <span>Illustrated walkthrough · no transactions are sent</span>
-        </div>
-        <nav className="chain-demo-flow" aria-label="Blockchain walkthrough steps">
-          {steps.map(({ short, Icon }, index) => (
-            <button
-              key={short}
-              className={'chain-demo-node' + (index === step ? ' active' : '')}
-              aria-current={index === step ? 'step' : undefined}
-              aria-controls="chain-demo-step"
-              onClick={() => setStep(index)}
-            >
-              <span className="chain-demo-step-number">
-                {index < step ? <Check size={13} /> : index + 1}
-              </span>
-              <Icon size={23} strokeWidth={1.5} />
-              <span>{short}</span>
-              <ArrowRight className="chain-demo-connector" size={15} aria-hidden="true" />
-            </button>
-          ))}
-        </nav>
-        <div
-          id="chain-demo-step"
-          className="panel chain-demo-step"
-          aria-live="polite"
-          aria-atomic="true"
+      <div
+        className="blockchain-view-tabs"
+        role="tablist"
+        aria-label="Walkthrough view"
+        onKeyDown={(event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const code = event.key === 'Home' ? false : event.key === 'End' ? true : !technical;
+          selectView(code);
+          event.currentTarget
+            .querySelectorAll<HTMLButtonElement>('[role="tab"]')
+            [code ? 1 : 0]?.focus();
+        }}
+      >
+        <button
+          id="purchase-flow-tab"
+          type="button"
+          role="tab"
+          aria-selected={!technical}
+          tabIndex={technical ? -1 : 0}
+          aria-controls="purchase-flow-panel"
+          onClick={() => selectView(false)}
         >
-          <div className="chain-demo-step-copy">
-            <span className="eyebrow">
-              Step {step + 1} of {steps.length} · {current.layer}
-            </span>
-            <h3>{current.title}</h3>
-            <p>{current.description}</p>
-            <blockquote>{current.takeaway}</blockquote>
-          </div>
-          <ul>
-            {current.facts.map((fact) => (
-              <li key={fact}>
-                <Check size={15} />
-                <span>{fact}</span>
+          Purchase flow
+        </button>
+        <button
+          id="technical-code-tab"
+          type="button"
+          role="tab"
+          aria-selected={technical}
+          tabIndex={technical ? 0 : -1}
+          aria-controls="technical-code-panel"
+          onClick={() => selectView(true)}
+        >
+          Code & startup
+        </button>
+      </div>
+      {!technical && (
+        <section
+          id="purchase-flow-panel"
+          role="tabpanel"
+          className="chain-demo-walkthrough"
+          aria-labelledby="purchase-flow-tab"
+        >
+          <div className="panel escrow-lifecycle">
+            <h2>New purchases use escrow</h2>
+            <ol>
+              <li>
+                <strong>Deposit</strong>
+                <span>
+                  The buyer pays the contract. Funds are held; no license or revenue credit is
+                  issued.
+                </span>
               </li>
+              <li>
+                <strong>Delivery · 72 hours</strong>
+                <span>
+                  The seller confirms the file is ready. Without delivery, a full refund becomes
+                  available.
+                </span>
+              </li>
+              <li>
+                <strong>Review · 24 hours</strong>
+                <span>
+                  The buyer inspects the file and accepts, or opens a dispute. After the review
+                  deadline, anyone can submit a release transaction for an undisputed order.
+                </span>
+              </li>
+              <li>
+                <strong>Dispute · 7 days</strong>
+                <span>
+                  A manager acts through the platform arbiter to release or refund. If no decision
+                  arrives, a refund becomes available.
+                </span>
+              </li>
+              <li>
+                <strong>Settlement</strong>
+                <span>
+                  Release starts the license and credits the seller, co-authors and commission. A
+                  refund credits the buyer’s separate refund balance. Each recipient withdraws with
+                  their own wallet.
+                </span>
+              </li>
+            </ol>
+            <p className="field-hint">
+              Timers enable actions. They do not send transactions by themselves. The platform
+              arbiter is a trusted dispute resolver in this local prototype.
+            </p>
+          </div>
+          <div className="chain-demo-section-heading">
+            <h2 id="chain-demo-flow-title">The current escrow license flow</h2>
+            <span>Illustrated walkthrough · no transactions are sent</span>
+          </div>
+          <nav className="chain-demo-flow" aria-label="Blockchain walkthrough steps">
+            {steps.map(({ short, Icon }, index) => (
+              <button
+                key={short}
+                className={'chain-demo-node' + (index === step ? ' active' : '')}
+                aria-current={index === step ? 'step' : undefined}
+                aria-controls="chain-demo-step"
+                onClick={() => setStep(index)}
+              >
+                <span className="chain-demo-step-number">
+                  {index < step ? <Check size={13} /> : index + 1}
+                </span>
+                <Icon size={23} strokeWidth={1.5} />
+                <span>{short}</span>
+                <ArrowRight className="chain-demo-connector" size={15} aria-hidden="true" />
+              </button>
             ))}
-          </ul>
-        </div>
-        <div className="chain-demo-controls">
-          <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
-            <ArrowLeft size={15} />
-            Previous
-          </Button>
-          <span>
-            {step + 1} / {steps.length}
-          </span>
-          <Button
-            className="primary"
-            onClick={() => setStep(step === steps.length - 1 ? 0 : step + 1)}
+          </nav>
+          <div
+            id="chain-demo-step"
+            className="panel chain-demo-step"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {step === steps.length - 1 ? 'Start again' : 'Next step'}
-            <ArrowRight size={15} />
-          </Button>
-        </div>
-      </section>
+            <div className="chain-demo-step-copy">
+              <span className="eyebrow">
+                Step {step + 1} of {steps.length} · {current.layer}
+              </span>
+              <h3>{current.title}</h3>
+              <p>{current.description}</p>
+              <blockquote>{current.takeaway}</blockquote>
+            </div>
+            <ul>
+              {current.facts.map((fact) => (
+                <li key={fact}>
+                  <Check size={15} />
+                  <span>{fact}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="chain-demo-controls">
+            <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
+              <ArrowLeft size={15} />
+              Previous
+            </Button>
+            <span>
+              {step + 1} / {steps.length}
+            </span>
+            <Button
+              className="primary"
+              onClick={() => setStep(step === steps.length - 1 ? 0 : step + 1)}
+            >
+              {step === steps.length - 1 ? 'Start again' : 'Next step'}
+              <ArrowRight size={15} />
+            </Button>
+          </div>
+        </section>
+      )}
 
-      {allowed && <BlockchainSandbox />}
-      <EscrowProof />
+      {technical && (
+        <section id="technical-code-panel" role="tabpanel" aria-labelledby="technical-code-tab">
+          <Suspense fallback={<p role="status">Loading real project source…</p>}>
+            <TechnicalCodeWalkthrough />
+          </Suspense>
+        </section>
+      )}
+
+      {!technical && allowed && <BlockchainSandbox />}
+      <div id="escrow-live-proof">
+        <EscrowProof />
+      </div>
       <details
         className="panel chain-demo-boundary"
         onToggle={(event) => setLegacyProofOpen(event.currentTarget.open)}
