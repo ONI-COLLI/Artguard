@@ -19,6 +19,7 @@ import { BlockchainProof } from '../components/blockchain-proof';
 import { EscrowProof } from '../components/escrow-proof';
 import { BlockchainSandbox } from '../components/blockchain-sandbox';
 import '../components/technical-code.css';
+import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
 const TechnicalCodeWalkthrough = lazy(() => import('../components/technical-code'));
 
 const steps = [
@@ -116,6 +117,34 @@ const steps = [
 export default function BlockchainDemonstration() {
   const [params, setParams] = useSearchParams();
   const technical = params.get('view') === 'code';
+  const language: CodeLanguage = params.get('lang') === 'ru' ? 'ru' : 'en';
+  const t = (value: Translation) => translated(value, language);
+  function setLanguage(value: CodeLanguage) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.set('lang', value);
+        return next;
+      },
+      { replace: true },
+    );
+  }
+  function explain(id: string) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.set('view', 'code');
+        next.set('step', id);
+        return next;
+      },
+      { replace: true },
+    );
+    requestAnimationFrame(() =>
+      document
+        .getElementById('technical-code-panel')
+        ?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }),
+    );
+  }
   function selectView(code: boolean) {
     setParams(
       (p) => {
@@ -199,6 +228,34 @@ export default function BlockchainDemonstration() {
           Code & startup
         </button>
       </div>
+      {!technical && (
+        <div className="technical-entry-note">
+          <div>
+            <strong>
+              {t(both('Looking for the technical explanation?', 'Нужен технический разбор?'))}
+            </strong>
+            <p>
+              {t(
+                both(
+                  'The purchase flow explains the scenario. Open the code walkthrough for wallet connection, storage paths and escrow functions.',
+                  'Сценарий покупки объясняет действия. Подключение кошельков, пути хранения и функции escrow показаны в разборе кода.',
+                ),
+              )}
+            </p>
+          </div>
+          <div className="actions">
+            <button className="button small" type="button" onClick={() => explain('wallet')}>
+              {t(both('Wallets', 'Кошельки'))}
+            </button>
+            <button className="button small" type="button" onClick={() => explain('storage')}>
+              {t(both('Storage map', 'Карта хранения'))}
+            </button>
+            <button className="button small" type="button" onClick={() => explain('deposit')}>
+              Escrow
+            </button>
+          </div>
+        </div>
+      )}
       {!technical && (
         <section
           id="purchase-flow-panel"
@@ -318,14 +375,33 @@ export default function BlockchainDemonstration() {
       {technical && (
         <section id="technical-code-panel" role="tabpanel" aria-labelledby="technical-code-tab">
           <Suspense fallback={<p role="status">Loading real project source…</p>}>
-            <TechnicalCodeWalkthrough />
+            <TechnicalCodeWalkthrough
+              language={language}
+              stepId={params.get('step') || undefined}
+              onLanguageChange={setLanguage}
+              onStepChange={(id) =>
+                setParams(
+                  (previous) => {
+                    const next = new URLSearchParams(previous);
+                    next.set('step', id);
+                    return next;
+                  },
+                  { replace: true },
+                )
+              }
+            />
           </Suspense>
         </section>
       )}
 
       {!technical && allowed && <BlockchainSandbox />}
       <div id="escrow-live-proof">
-        <EscrowProof />
+        <EscrowProof
+          language={language}
+          onLanguageChange={setLanguage}
+          onExplain={explain}
+          showLanguageControl={!technical}
+        />
       </div>
       <details
         className="panel chain-demo-boundary"
@@ -364,6 +440,15 @@ export default function BlockchainDemonstration() {
           The platform prepares signed offers and controls access to stored files. This is a local
           prototype with one Anvil node; it has no public-network decentralization or NFT tokens.
         </p>
+        <button className="button small" type="button" onClick={() => explain('storage')}>
+          {t(
+            both(
+              'Open paths, formats and real storage code',
+              'Открыть пути, форматы и реальный код хранения',
+            ),
+          )}
+          <ArrowRight size={15} />
+        </button>
       </details>
       <details className="panel chain-demo-guide">
         <summary>

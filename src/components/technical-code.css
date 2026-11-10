@@ -104,6 +104,178 @@
   gap: 5px;
   position: sticky;
   top: 20px;
+  max-height: calc(100dvh - 45px);
+  overflow-y: auto;
+}
+.technical-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 20px;
+}
+.technical-shortcuts button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  gap: 7px 12px;
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #604938;
+  border-radius: 12px;
+  background: #241f1b;
+  color: #f5c0a7;
+}
+.technical-shortcuts button strong {
+  font-size: 13px;
+}
+.technical-shortcuts button > span {
+  grid-row: 2;
+  font-size: 11px;
+  color: #b7aaa3;
+  line-height: 1.6;
+}
+.technical-shortcuts button svg {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+.technical-flow-map {
+  padding: 16px;
+  border: 1px solid #4e3b2e;
+  border-radius: 12px;
+  background: #211d19;
+  margin: 18px 0;
+}
+.technical-flow-map h4 {
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+.technical-flow-map > p {
+  color: #b6a99f;
+  font-size: 11px;
+  line-height: 1.8;
+  margin: 12px 0 0;
+}
+.technical-request-trace {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.technical-request-trace li {
+  padding: 12px;
+  background: #2c251f;
+  border: 1px solid #514033;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.technical-request-trace li > span {
+  display: block;
+  color: #f6ab88;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+.technical-storage-map {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+.technical-storage-map article {
+  padding: 16px;
+  background: #1c1c1c;
+  border: 1px solid #3e3a34;
+  border-radius: 11px;
+  min-width: 0;
+}
+.technical-storage-map h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+.technical-storage-map code {
+  display: block;
+  color: #e6bb9d;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.technical-storage-map article > span {
+  display: block;
+  color: #9e9e9e;
+  font-size: 11px;
+  margin: 8px 0 10px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.technical-storage-map details summary {
+  font-size: 11px;
+  color: #ccc;
+  cursor: pointer;
+}
+.technical-storage-map details p {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #b6b6b6;
+  line-height: 1.8;
+}
+.technical-escrow-trace {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+.technical-escrow-trace button {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid #514033;
+  border-radius: 9px;
+  background: #27221e;
+  color: #d1c5ba;
+}
+.technical-escrow-trace button.active {
+  border-color: #e2966e;
+  background: #3b2b20;
+  color: #ffc49f;
+}
+.technical-escrow-trace button strong {
+  font-size: 12px;
+}
+.technical-escrow-trace button span {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.technical-escrow-trace button:last-child {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  background: #242323;
+}
+.technical-entry-note {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #4a3c31;
+  background: #221e1a;
+  padding: 18px;
+  border-radius: 12px;
+  margin: 0 0 20px;
+}
+.technical-entry-note strong {
+  font-size: 14px;
+}
+.technical-entry-note p {
+  color: #b8b0a7;
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 740px;
+  margin: 8px 0 0;
 }
 .technical-step-nav button {
   display: flex;
@@ -401,6 +573,14 @@
     flex-direction: row;
     overflow-x: auto;
     padding: 0 0 7px;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .technical-request-trace {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .technical-escrow-trace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .technical-step-nav button {
     white-space: nowrap;
@@ -446,6 +626,13 @@
   }
 }
 @media (max-width: 480px) {
+  .technical-shortcuts,
+  .technical-storage-map {
+    grid-template-columns: 1fr;
+  }
+  .technical-request-trace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .technical-io {
     grid-template-columns: 1fr;
   }

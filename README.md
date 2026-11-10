@@ -156,6 +156,20 @@ per month. Co-author shares apply after commission. For a Free-plan payment of
 **0.012 test ETH** with a 75/25 net split, the contract credits **0.0012** to the
 platform, **0.0081** to the creator and **0.0027** to the co-author. Gas is separate.
 
+## Technical walkthrough with source code
+
+Open **`/#/blockchain-demo?view=code`**, without signing in. The 15-step guide
+shows startup commands, exact source excerpts with line numbers, external-wallet
+SIWE linking, custodial demo signing, a storage map and the escrow lifecycle.
+Select **RU** for Russian explanations. Direct sections use `&step=wallet`,
+`&step=storage` or `&step=deposit`; `&lang=ru` preserves the explanation language.
+
+The storage map distinguishes browser session data, SQLite rows, original files,
+Anvil contract storage and generated TXT license records. It documents paths and
+formats without displaying runtime database contents or private keys. The
+interactive diagrams explain the implementation and do not connect a wallet,
+sign or send a transaction. The separate live verification panel reads RPC.
+
 ## Verify a blockchain purchase
 
 Open **`/#/blockchain-demo`** and use **Verify a real escrow payment**. Paste the
@@ -164,6 +178,8 @@ Anvil JSON-RPC: successful receipt, canonical block, deployed code, decoded inpu
 events, escrow state, licence validity and revenue allocations. Deposit, release
 and withdrawal are distinct transactions. Earlier direct-payment proofs are in
 the explicitly labelled archive.
+Each verification result expands to explain which node values are compared;
+failed checks stay failed and are not replaced with illustrated results.
 
 The saved recording's [canonical receipts](deliverables/three-minute/canonical-receipts.json)
 and [on-chain proof](deliverables/three-minute/on-chain-proof.json) identify its

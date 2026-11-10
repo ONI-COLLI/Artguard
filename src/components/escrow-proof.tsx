@@ -4,7 +4,23 @@ import { api } from '../lib/api';
 import { Button } from './ui';
 import { testEth } from '../../shared/marketplace';
 import type { EscrowProof as Proof } from '../../shared/escrow-proof';
-export function EscrowProof() {
+import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
+import { explainEscrowCheck } from '../lib/escrow-proof-explainer';
+import './escrow-proof.css';
+export function EscrowProof({
+  language: suppliedLanguage,
+  onLanguageChange,
+  onExplain,
+  showLanguageControl = true,
+}: {
+  language?: CodeLanguage;
+  onLanguageChange?: (language: CodeLanguage) => void;
+  onExplain?: (id: string) => void;
+  showLanguageControl?: boolean;
+} = {}) {
+  const [localLanguage, setLocalLanguage] = useState<CodeLanguage>('en');
+  const language = suppliedLanguage ?? localLanguage;
+  const t = (value: Translation) => translated(value, language);
   const [input, setInput] = useState(''),
     [hash, setHash] = useState('');
   const query = useQuery({
@@ -18,10 +34,58 @@ export function EscrowProof() {
   const data = query.data && Array.isArray(query.data.orders) ? query.data : null;
   return (
     <section className="panel escrow-proof">
-      <h2>Verify a real escrow payment</h2>
+      <div className="escrow-proof-heading">
+        <h2>{t(both('Verify a real escrow payment', 'Проверить настоящую оплату escrow'))}</h2>
+        {showLanguageControl && (
+          <div className="technical-language" role="group" aria-label="Proof explanation language">
+            {(['en', 'ru'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={value === language}
+                onClick={() => {
+                  setLocalLanguage(value);
+                  onLanguageChange?.(value);
+                }}
+              >
+                {value.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <p className="muted">
-        Reads the local blockchain directly. No login or database purchase record is required.
+        {t(
+          both(
+            'Reads the local blockchain directly. No login or database purchase record is required.',
+            'Данные читаются напрямую из локального блокчейна. Вход и запись покупки в базе не требуются.',
+          ),
+        )}
       </p>
+      <div className="escrow-proof-explanation">
+        <strong>{t(both('What are the checks below?', 'Что означают пункты ниже?'))}</strong>
+        <p>
+          {t(
+            both(
+              'They are verification results for an existing payment, not steps to buy. Each compares data read from the node: transaction → block → contract state → release or refund events. Expand a result to see what is compared.',
+              'Это результаты проверки существующей оплаты, а не шаги покупки. Каждый пункт сверяет данные узла: транзакция → блок → состояние контракта → события завершения или возврата. Раскройте пункт, чтобы увидеть, что сравнивается.',
+            ),
+          )}
+        </p>
+        {onExplain && (
+          <div className="actions">
+            <button type="button" className="text-button" onClick={() => onExplain('wallet')}>
+              {t(both('Wallet connection + code', 'Подключение кошелька + код'))}
+            </button>
+            <button type="button" className="text-button" onClick={() => onExplain('deposit')}>
+              {t(both('Escrow lifecycle + code', 'Жизненный цикл escrow + код'))}
+            </button>
+            <button type="button" className="text-button" onClick={() => onExplain('storage')}>
+              {t(both('Where data is stored', 'Где хранятся данные'))}
+            </button>
+          </div>
+        )}
+      </div>
       <form
         className="escrow-proof-form"
         onSubmit={(e) => {
@@ -31,7 +95,12 @@ export function EscrowProof() {
         }}
       >
         <label className="field-label" htmlFor="escrow-proof-hash">
-          Deposit transaction hash (leave empty for the latest)
+          {t(
+            both(
+              'Deposit transaction hash (leave empty for the latest)',
+              'Хеш транзакции депозита (пусто — последняя оплата)',
+            ),
+          )}
         </label>
         <div className="actions">
           <input
@@ -42,7 +111,7 @@ export function EscrowProof() {
             pattern="0x[a-fA-F0-9]{64}"
           />
           <Button type="submit" busy={query.isFetching}>
-            Verify escrow
+            {t(both('Verify escrow', 'Проверить escrow'))}
           </Button>
         </div>
       </form>
@@ -52,64 +121,156 @@ export function EscrowProof() {
         </p>
       )}
       {query.isFetching && (
-        <p role="status">Reading deposit, contract state and settlement events…</p>
+        <p role="status">
+          {t(
+            both(
+              'Reading deposit, contract state and settlement events…',
+              'Читаем депозит, состояние контракта и события завершения…',
+            ),
+          )}
+        </p>
       )}
       {data && !query.error && (
         <>
-          <p role="status">{data.message}</p>
-          <ul className="chain-proof-checks">
-            {data.checks.map((c, i) => (
-              <li className={c.passed ? 'passed' : 'failed'} key={i}>
-                {c.passed ? '✓' : '✕'} {c.label}
-              </li>
-            ))}
+          <p role="status">
+            {language === 'ru' && data.status === 'verified'
+              ? 'Узел подтвердил депозит и текущее состояние escrow. Начисления и вывод — отдельные действия.'
+              : data.message}
+          </p>
+          {data.checks.length > 0 && (
+            <p className="escrow-check-count">
+              {t(both('Passed checks', 'Пройдено проверок'))}:{' '}
+              <strong>
+                {data.checks.filter((check) => check.passed).length} / {data.checks.length}
+              </strong>
+            </p>
+          )}
+          <ul className="chain-proof-checks explained-proof-checks">
+            {data.checks.map((c, i) => {
+              const explanation = explainEscrowCheck(c.label);
+              return (
+                <li className={c.passed ? 'passed' : 'failed'} key={i}>
+                  <details>
+                    <summary>
+                      <span
+                        aria-label={t(
+                          c.passed ? both('Passed', 'Пройдено') : both('Failed', 'Не пройдено'),
+                        )}
+                      >
+                        {c.passed ? '✓' : '✕'}
+                      </span>{' '}
+                      {explanation ? t(explanation.title) : c.label}
+                    </summary>
+                    {explanation && <p>{t(explanation.detail)}</p>}
+                    <code>{c.label}</code>
+                    {onExplain && (
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() => onExplain('verify')}
+                      >
+                        {t(both('Open the verification code', 'Открыть код проверки'))}
+                      </button>
+                    )}
+                  </details>
+                </li>
+              );
+            })}
           </ul>
           {data.status === 'verified' &&
             data.orders.map((o) => (
               <article className="escrow-proof-order" key={o.id}>
                 <div className="escrow-card-title">
-                  <strong>On-chain status: {o.state}</strong>
+                  <strong>
+                    {t(both('On-chain status', 'Состояние в блокчейне'))}:{' '}
+                    {language === 'ru'
+                      ? {
+                          funded: 'депозит удерживается',
+                          delivered: 'передан на проверку',
+                          disputed: 'открыт спор',
+                          released: 'сделка завершена',
+                          refunded: 'возврат начислен',
+                        }[o.state] || o.state
+                      : o.state}
+                  </strong>
                   <strong>{testEth(o.amountWei)}</strong>
                 </div>
                 <p>
-                  Held for this order: {testEth(o.heldWei)} · Current wallet license:{' '}
-                  {o.licenseActive ? 'active' : 'inactive'}
+                  {t(both('Held for this order', 'Удерживается для заказа'))}: {testEth(o.heldWei)}{' '}
+                  · {t(both('Current wallet license', 'Лицензия кошелька сейчас'))}:{' '}
+                  {t(
+                    o.licenseActive
+                      ? both('active', 'действует')
+                      : both('inactive', 'не действует'),
+                  )}
                 </p>
                 {['funded', 'delivered', 'disputed'].includes(o.state) && (
                   <p>
-                    No revenue from this order has been released to the seller, co-authors or
-                    platform.
+                    {t(
+                      both(
+                        'No revenue from this order has been released to the seller, co-authors or platform.',
+                        'Выручка этого заказа ещё не начислена автору, соавторам и сервису.',
+                      ),
+                    )}
                   </p>
                 )}
                 <details>
-                  <summary>Deposit and settlement transactions</summary>
+                  <summary>
+                    {t(
+                      both(
+                        'Deposit and settlement transactions',
+                        'Транзакции депозита и завершения',
+                      ),
+                    )}
+                  </summary>
                   <p>
-                    Deposit · block {o.block}: <code>{o.depositHash}</code>
+                    {t(both('Deposit · block', 'Депозит · блок'))} {o.block}:{' '}
+                    <code>{o.depositHash}</code>
                   </p>
                   {o.releaseHash && (
                     <p>
-                      Release: <code>{o.releaseHash}</code>
+                      {t(both('Release', 'Завершение'))}: <code>{o.releaseHash}</code>
                     </p>
                   )}
                   {o.refundHash && (
                     <p>
-                      Refund credited: <code>{o.refundHash}</code>
+                      {t(both('Refund credited', 'Возврат начислен'))}: <code>{o.refundHash}</code>
                     </p>
                   )}
                   <p>
-                    Order: <code>{o.id}</code>
+                    {t(both('Order', 'Заказ'))}: <code>{o.id}</code>
                   </p>
                   <p>
-                    Buyer: <code>{o.buyer}</code>
+                    {t(both('Buyer', 'Покупатель'))}: <code>{o.buyer}</code>
                   </p>
                   <p>
-                    Seller: <code>{o.seller}</code>
+                    {t(both('Seller', 'Автор'))}: <code>{o.seller}</code>
                   </p>
-                  <p>Buyer’s available refund balance: {testEth(o.refundBalanceWei)}</p>
+                  <p>
+                    {t(
+                      both(
+                        'Buyer’s available refund balance',
+                        'Доступное начисление возврата покупателю',
+                      ),
+                    )}
+                    : {testEth(o.refundBalanceWei)}
+                  </p>
                 </details>
                 {o.allocations.length > 0 && (
                   <details>
-                    <summary>Revenue allocations at release</summary>
+                    <summary>
+                      {t(
+                        both('Revenue allocations at release', 'Начисления выручки при завершении'),
+                      )}
+                    </summary>
+                    <p>
+                      {t(
+                        both(
+                          'These amounts are contract credits. A separate withdrawal moves ETH to each wallet.',
+                          'Это начисления внутри контракта. ETH поступает в каждый кошелёк при отдельном выводе.',
+                        ),
+                      )}
+                    </p>
                     <ul>
                       {o.allocations.map((a, i) => (
                         <li key={i}>
@@ -121,16 +282,28 @@ export function EscrowProof() {
                 )}
                 {o.withdrawals.length > 0 && (
                   <details>
-                    <summary>Confirmed withdrawals (recent 5,000 blocks)</summary>
+                    <summary>
+                      {t(
+                        both(
+                          'Confirmed withdrawals (recent 5,000 blocks)',
+                          'Подтверждённые выводы (последние 5 000 блоков)',
+                        ),
+                      )}
+                    </summary>
                     <p className="field-hint">
-                      A withdrawal can combine credits from several orders.
+                      {t(
+                        both(
+                          'A withdrawal can combine credits from several orders.',
+                          'Один вывод может объединять начисления от нескольких заказов.',
+                        ),
+                      )}
                     </p>
                     <ul>
                       {o.withdrawals.map((w, i) => (
                         <li key={i}>
                           <code>{w.wallet}</code> · {testEth(w.amountWei)}
                           <p>
-                            Transaction: <code>{w.hash}</code>
+                            {t(both('Transaction', 'Транзакция'))}: <code>{w.hash}</code>
                           </p>
                         </li>
                       ))}
@@ -142,8 +315,19 @@ export function EscrowProof() {
         </>
       )}
       <p className="field-hint">
-        Source: Anvil JSON-RPC. Escrow deposit, license release and withdrawal are different
-        transactions.
+        {t(
+          both(
+            'Source: Anvil JSON-RPC. Deposit, release and withdrawal are different transactions.',
+            'Источник: Anvil JSON-RPC. Депозит, завершение и вывод — разные транзакции.',
+          ),
+        )}
+        {data && (
+          <>
+            {' '}
+            · {t(both('Checked', 'Проверено'))}:{' '}
+            {new Date(data.checkedAt).toLocaleString(language === 'ru' ? 'ru-RU' : 'en-GB')}
+          </>
+        )}
       </p>
     </section>
   );

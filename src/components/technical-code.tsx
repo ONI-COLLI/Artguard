@@ -21,6 +21,12 @@ import {
   type Translation,
 } from '../lib/technical-source';
 import './technical-code.css';
+import {
+  storageLocations,
+  walletTrace,
+  demoWalletTrace,
+  escrowTrace,
+} from '../lib/technical-guide';
 
 function CopyButton({ text, language }: { text: string; language: CodeLanguage }) {
   const [copied, setCopied] = useState(false),
@@ -228,9 +234,30 @@ function LiveStatus({ language }: { language: CodeLanguage }) {
     </section>
   );
 }
-export default function TechnicalCodeWalkthrough() {
-  const [step, setStep] = useState(0),
-    [language, setLanguage] = useState<CodeLanguage>('en');
+export default function TechnicalCodeWalkthrough({
+  language: suppliedLanguage,
+  stepId,
+  onLanguageChange,
+  onStepChange,
+}: {
+  language?: CodeLanguage;
+  stepId?: string;
+  onLanguageChange?: (language: CodeLanguage) => void;
+  onStepChange?: (id: string) => void;
+} = {}) {
+  const [localStep, setLocalStep] = useState(0),
+    [localLanguage, setLocalLanguage] = useState<CodeLanguage>('en');
+  const language = suppliedLanguage ?? localLanguage;
+  const requested = technicalSteps.findIndex((item) => item.id === stepId);
+  const step = requested >= 0 ? requested : localStep;
+  function setStep(index: number) {
+    setLocalStep(index);
+    onStepChange?.(technicalSteps[index].id);
+  }
+  function setLanguage(value: CodeLanguage) {
+    setLocalLanguage(value);
+    onLanguageChange?.(value);
+  }
   const t = (value: Translation) => translated(value, language),
     current = technicalSteps[step];
   const layers = [
@@ -270,6 +297,43 @@ export default function TechnicalCodeWalkthrough() {
           </button>
         </div>
       </header>
+      <div
+        className="technical-shortcuts"
+        aria-label={t(both('Key technical topics', 'Основные технические темы'))}
+      >
+        {(
+          [
+            [
+              'wallet',
+              both('How wallets connect', 'Как подключаются кошельки'),
+              both('Address → SIWE signature → account', 'Адрес → SIWE-подпись → аккаунт'),
+            ],
+            [
+              'storage',
+              both('Where data lives', 'Где хранятся данные'),
+              both('Browser · SQLite · disk · EVM', 'Браузер · SQLite · диск · EVM'),
+            ],
+            [
+              'deposit',
+              both('How escrow holds money', 'Как escrow удерживает деньги'),
+              both(
+                'Deposit → review → release or refund',
+                'Депозит → проверка → выплата или возврат',
+              ),
+            ],
+          ] as const
+        ).map(([id, title, description]) => (
+          <button
+            type="button"
+            key={id}
+            onClick={() => setStep(technicalSteps.findIndex((item) => item.id === id))}
+          >
+            <strong>{t(title)}</strong>
+            <span>{t(description)}</span>
+            <ArrowRight size={15} />
+          </button>
+        ))}
+      </div>
       <div
         className="technical-topology"
         aria-label={t(both('Application layers', 'Слои приложения'))}
@@ -320,6 +384,83 @@ export default function TechnicalCodeWalkthrough() {
               </div>
             </div>
           </div>
+          {['wallet', 'demo-wallet'].includes(current.id) && (
+            <div className="technical-flow-map">
+              <h4>{t(both('Request path', 'Путь запроса'))}</h4>
+              <ol className="technical-request-trace">
+                {(current.id === 'wallet' ? walletTrace : demoWalletTrace).map((item, i) => (
+                  <li key={i}>
+                    <span>{i + 1}</span>
+                    {t(item)}
+                  </li>
+                ))}
+              </ol>
+              <p>
+                {t(
+                  both(
+                    'Illustration of the implementation. These steps do not connect or sign from this page.',
+                    'Это схема реализации. Эта страница не подключает кошелёк и не запрашивает подпись.',
+                  ),
+                )}
+              </p>
+            </div>
+          )}
+          {current.id === 'storage' && (
+            <section
+              className="technical-storage-map"
+              aria-label={t(both('Data storage map', 'Карта хранения данных'))}
+            >
+              {storageLocations.map((item) => (
+                <article key={item.id}>
+                  <h4>{t(item.title)}</h4>
+                  <code>
+                    {typeof item.location === 'string' ? item.location : t(item.location)}
+                  </code>
+                  <span>{typeof item.format === 'string' ? item.format : t(item.format)}</span>
+                  <details>
+                    <summary>
+                      {t(both('Contents and access', 'Что внутри и как используется'))}
+                    </summary>
+                    <p>{t(item.content)}</p>
+                  </details>
+                </article>
+              ))}
+            </section>
+          )}
+          {escrowTrace.some((item) => item.id === current.id) && (
+            <section className="technical-flow-map">
+              <h4>
+                {t(
+                  both(
+                    'Escrow: where the money is at each stage',
+                    'Escrow: где деньги на каждом этапе',
+                  ),
+                )}
+              </h4>
+              <div className="technical-escrow-trace">
+                {escrowTrace.map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    className={item.id === current.id ? 'active' : ''}
+                    aria-current={item.id === current.id ? 'step' : undefined}
+                    onClick={() => setStep(technicalSteps.findIndex((step) => step.id === item.id))}
+                  >
+                    <strong>{t(item.title)}</strong>
+                    <span>{t(item.detail)}</span>
+                  </button>
+                ))}
+              </div>
+              <p>
+                {t(
+                  both(
+                    'Interactive explanation, not a new purchase. A credit in balances/refundBalances is still ETH held by the contract until withdrawal.',
+                    'Интерактивная схема, а не новая покупка. Начисление в balances/refundBalances остаётся ETH на адресе контракта до вывода.',
+                  ),
+                )}
+              </p>
+            </section>
+          )}
           {current.commands && (
             <section className="technical-terminal">
               <div>

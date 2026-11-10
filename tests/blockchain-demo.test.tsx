@@ -179,3 +179,22 @@ it('explains escrow delivery and release before showing a wallet license or reve
   expect(screen.getByText(/license period starts on release/)).toBeVisible();
   expect(mocks.api.mock.calls.some(([path]) => path === '/blockchain/demo-proof')).toBe(false);
 });
+it('opens the wallet and storage code walkthrough from the guest page without authentication', async () => {
+  mocks.signedIn = false;
+  setup();
+  await userEvent.click(screen.getByRole('button', { name: 'Storage map', exact: true }));
+  expect(
+    await screen.findByRole('heading', { name: '6. Where each type of data is stored' }),
+  ).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: /How wallets connect/ }));
+  expect(screen.getByRole('heading', { name: /4\. Connect and prove/ })).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: 'RU', exact: true }));
+  expect(
+    screen.getByRole('heading', { name: '4. Подключить внешний кошелёк и подтвердить владение' }),
+  ).toBeVisible();
+  expect(
+    mocks.api.mock.calls.every(
+      ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
+    ),
+  ).toBe(true);
+});

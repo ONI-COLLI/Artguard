@@ -12,7 +12,7 @@ beforeEach(() => {
 });
 
 it('shows current source lines and preserves the startup and escrow/withdrawal boundaries', () => {
-  expect(technicalSteps).toHaveLength(10);
+  expect(technicalSteps).toHaveLength(15);
   for (const step of technicalSteps)
     for (const excerpt of step.sources) {
       expect(excerpt.path).not.toMatch(/\.env|private\.json|runtime\/|data\//);
@@ -25,9 +25,11 @@ it('shows current source lines and preserves the startup and escrow/withdrawal b
           .join('\n'),
       ).toBe(excerpt.code);
     }
-  expect(technicalSteps.find((s) => s.id === 'deposit')!.sources[0].path).toBe(
-    'contracts/EscrowLicenseMarketplace.sol',
-  );
+  expect(
+    technicalSteps
+      .find((s) => s.id === 'deposit')!
+      .sources.some((s) => s.path === 'contracts/EscrowLicenseMarketplace.sol'),
+  ).toBe(true);
   expect(technicalSteps.find((s) => s.id === 'withdraw')!.sources[0].code).toContain(
     'balances[msg.sender] = 0',
   );
@@ -41,7 +43,7 @@ it('lets a guest study actual startup, fingerprint and contract code without sen
   const nav = within(screen.getByRole('navigation', { name: 'Code walkthrough steps' }));
   await userEvent.click(nav.getByRole('button', { name: /File hash/ }));
   expect(
-    screen.getByRole('heading', { name: '4. Upload a file and calculate its fingerprint' }),
+    screen.getByRole('heading', { name: '7. Upload a file and calculate its fingerprint' }),
   ).toBeVisible();
   expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
     'href',
@@ -49,12 +51,36 @@ it('lets a guest study actual startup, fingerprint and contract code without sen
   );
   await userEvent.click(screen.getByRole('button', { name: 'RU' }));
   expect(
-    screen.getByRole('heading', { name: '4. Загрузить файл и вычислить отпечаток' }),
+    screen.getByRole('heading', { name: '7. Загрузить файл и вычислить отпечаток' }),
   ).toBeVisible();
   await userEvent.click(nav.getByRole('button', { name: /Вывод/ }));
   expect(
-    screen.getByRole('heading', { name: '9. Вывести начисление автора или соавтора' }),
+    screen.getByRole('heading', { name: '14. Вывести начисление автора или соавтора' }),
   ).toBeVisible();
+  expect(mocks.api).not.toHaveBeenCalled();
+});
+it('explains external and hosted wallets, actual storage formats and escrow branches without signing', async () => {
+  render(<TechnicalCode />);
+  await userEvent.click(screen.getByRole('button', { name: /How wallets connect/ }));
+  expect(screen.getByRole('heading', { name: /4\. Connect and prove/ })).toBeVisible();
+  expect(screen.getByText(/The external private key stays in the wallet/)).toBeVisible();
+  const nav = within(screen.getByRole('navigation', { name: 'Code walkthrough steps' }));
+  await userEvent.click(nav.getByRole('button', { name: /Test wallets/ }));
+  expect(screen.getByText(/This prototype mode is custodial/)).toBeVisible();
+  await userEvent.click(nav.getByRole('button', { name: /Data storage/ }));
+  const map = within(screen.getByRole('region', { name: 'Data storage map' }));
+  expect(map.getAllByRole('article')).toHaveLength(8);
+  const document = map
+    .getByRole('heading', { name: 'Downloadable license record' })
+    .closest('article')!;
+  await userEvent.click(within(document).getByText('Contents and access'));
+  expect(within(document).getByText(/TXT generated on request/)).toBeVisible();
+  expect(within(document).getByText(/It is not an NFT/)).toBeVisible();
+  await userEvent.click(nav.getByRole('button', { name: /Deposit/ }));
+  await userEvent.click(screen.getByRole('button', { name: /2\. Delivery \/ dispute/ }));
+  expect(screen.getByRole('heading', { name: /11\. Confirm delivery/ })).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: /Alternative: refund/ }));
+  expect(screen.getByText(/separately calls withdrawRefund/)).toBeVisible();
   expect(mocks.api).not.toHaveBeenCalled();
 });
 it('checks live connectivity only on request, reports failures and never sends a transaction', async () => {

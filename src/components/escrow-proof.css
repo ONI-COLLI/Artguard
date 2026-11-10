@@ -1,0 +1,104 @@
+.escrow-proof-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: start;
+}
+.escrow-proof .technical-language {
+  display: flex;
+  gap: 3px;
+  border: 1px solid #444;
+  border-radius: 9px;
+  padding: 3px;
+}
+.escrow-proof .technical-language button {
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  padding: 7px;
+  font-size: 11px;
+  color: #aaa;
+}
+.escrow-proof .technical-language button[aria-pressed='true'] {
+  background: #3b2d24;
+  color: #ffb18f;
+}
+.escrow-proof-explanation {
+  background: #25211d;
+  border-left: 2px solid #b8815f;
+  padding: 14px 16px;
+  border-radius: 0 8px 8px 0;
+  margin: 18px 0;
+}
+.escrow-proof-explanation > strong {
+  font-size: 13px;
+}
+.escrow-proof-explanation > p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #c4b8aa;
+  margin: 8px 0 10px;
+}
+.escrow-proof-explanation .actions {
+  gap: 8px 22px;
+  flex-wrap: wrap;
+}
+.escrow-proof-explanation button {
+  font-size: 11px;
+  color: #f5b38d;
+  padding: 0;
+  text-align: left;
+}
+.escrow-check-count {
+  font-size: 12px;
+  color: #aaa;
+}
+.explained-proof-checks li {
+  display: block;
+  min-width: 0;
+}
+.explained-proof-checks li details {
+  width: 100%;
+}
+.explained-proof-checks li summary {
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #d0c7be;
+}
+.explained-proof-checks li.failed summary {
+  color: #ffac8e;
+}
+.explained-proof-checks li details > p {
+  font-size: 12px;
+  color: #b5b5b5;
+  line-height: 1.8;
+  margin: 10px 0;
+}
+.explained-proof-checks li code {
+  display: block;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #9d9d9d;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.explained-proof-checks li button {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #f5ad88;
+  padding: 0;
+}
+.escrow-proof button:focus-visible,
+.explained-proof-checks summary:focus-visible {
+  outline: 2px solid #f59a78;
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .escrow-proof-explanation {
+    padding: 12px;
+  }
+  .escrow-proof-heading h2 {
+    font-size: 20px;
+  }
+}
