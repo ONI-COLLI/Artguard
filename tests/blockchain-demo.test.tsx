@@ -88,7 +88,7 @@ beforeEach(() => {
     ),
   );
 });
-it('maps old links to the selected fullscreen block and preserves its URL and language', async () => {
+it('maps old links to the selected in-page block and preserves its URL and language', async () => {
   mocks.signedIn = false;
   const view = setup('/blockchain-demo?view=code&step=deposit&lang=ru');
   expect(

@@ -55,7 +55,7 @@ function setup() {
     </QueryClientProvider>,
   );
 }
-it('uses four horizontal blocks and shows the editor and terminal together without disclosures', async () => {
+it('uses four blocks with source filenames and line numbers, without an IDE shell', async () => {
   const view = setup();
   expect(studioBlocks).toHaveLength(4);
   expect(new Set(studioBlocks.flatMap((block) => block.steps)).size).toBe(8);
@@ -65,25 +65,31 @@ it('uses four horizontal blocks and shows the editor and terminal together witho
   expect(screen.getByRole('region', { name: 'Terminal and output' })).toBeVisible();
   expect(screen.getByText(/npm run chain/, { selector: 'code' })).toBeVisible();
   expect(view.container.querySelectorAll('.syntax-keyword').length).toBeGreaterThan(0);
-  expect(view.container.querySelectorAll('.studio-line-number').length).toBeGreaterThan(0);
+  expect(view.container.querySelectorAll('.walkthrough-line-number').length).toBeGreaterThan(0);
   expect(view.container.querySelectorAll('details,summary')).toHaveLength(0);
-  expect(screen.getByRole('link', { name: 'Back to ArtGuard' })).toHaveAttribute('href', '/home');
+  expect(screen.getByRole('region', { name: 'Code' })).toBeVisible();
+  expect(screen.getByRole('link', { name: 'deploy-escrow-marketplace.mjs' })).toBeVisible();
+  expect(screen.getByText('scripts/')).toBeVisible();
+  expect(
+    view.container.querySelector('.studio-fullscreen, .studio-activity, .studio-statusbar'),
+  ).toBeNull();
+  expect(screen.queryByRole('link', { name: 'Back to ArtGuard' })).not.toBeInTheDocument();
   expect(mocks.api).not.toHaveBeenCalled();
 });
-it('navigates blocks by keyboard, keeps all selected source fragments and exposes storage in block two', async () => {
+it('navigates blocks by keyboard and shows filenames, directories and storage', async () => {
   setup();
   screen.getByRole('tab', { name: /Start/ }).focus();
   await userEvent.keyboard('{ArrowRight}');
   expect(screen.getByRole('heading', { name: 'Wallet → file → fingerprint' })).toBeVisible();
   expect(screen.getByText('data/artguard.sqlite')).toBeVisible();
-  const codeParts = document.querySelectorAll('.studio-code-file pre').length;
-  await userEvent.click(screen.getByRole('button', { name: /ArtworkRegistry.sol/ }));
-  expect(document.querySelectorAll('.studio-code-file pre')).toHaveLength(codeParts);
+  expect(screen.getByRole('link', { name: 'ArtworkRegistry.sol' })).toBeVisible();
+  expect(screen.getByText('contracts/')).toBeVisible();
+  expect(document.querySelectorAll('.walkthrough-code-file pre').length).toBeGreaterThan(1);
   expect(mocks.api).not.toHaveBeenCalled();
 });
 it('labels examples and reads the real node only in the payout and verification block', async () => {
   setup();
-  expect(screen.getByText('EXAMPLE OUTPUT')).toBeVisible();
+  expect(screen.getAllByText('Terminal example')).toHaveLength(2);
   await userEvent.click(screen.getByRole('tab', { name: /Payouts & proof/ }));
   expect(await screen.findByText('No local deposit.')).toBeVisible();
   expect(screen.getByText('LIVE · ANVIL JSON-RPC')).toBeVisible();

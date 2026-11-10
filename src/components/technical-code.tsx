@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Box, Code2, Files, GitBranch, LockKeyhole, Terminal, X } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { linearSteps, linearStorage, studioBlocks } from '../lib/linear-walkthrough';
 import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
 import { LiveChainResult } from './live-chain-result';
@@ -40,15 +39,6 @@ function SyntaxLine({ line }: { line: string }) {
     </>
   );
 }
-function fileKind(path: string) {
-  return path.endsWith('.sol')
-    ? 'SOL'
-    : path.endsWith('.tsx')
-      ? 'TSX'
-      : path.endsWith('.ts')
-        ? 'TS'
-        : 'JS';
-}
 export default function TechnicalCodeWalkthrough({
   language: suppliedLanguage,
   onLanguageChange,
@@ -66,85 +56,73 @@ export default function TechnicalCodeWalkthrough({
   const [localBlock, setLocalBlock] = useState(0);
   const language = suppliedLanguage ?? localLanguage;
   const index =
-    suppliedBlock !== undefined && suppliedBlock >= 0 && suppliedBlock < studioBlocks.length
+    suppliedBlock !== undefined &&
+    Number.isInteger(suppliedBlock) &&
+    suppliedBlock >= 0 &&
+    suppliedBlock < studioBlocks.length
       ? suppliedBlock
       : localBlock;
   const block = studioBlocks[index];
   const steps = block.steps.map((id) => linearSteps.find((step) => step.id === id)!);
   const sources = steps.flatMap((step) => step.sources);
   const paths = [...new Set(sources.map((source) => source.path))];
-  const firstPath = paths[0];
-  const [activeFile, setActiveFile] = useState(firstPath);
-  const editor = useRef<HTMLDivElement>(null),
-    terminal = useRef<HTMLDivElement>(null),
-    tabs = useRef<Array<HTMLButtonElement | null>>([]);
-  const files = useRef(new Map<string, HTMLElement>());
+  const container = useRef<HTMLElement>(null),
+    editor = useRef<HTMLDivElement>(null),
+    terminal = useRef<HTMLDivElement>(null);
+  const tabs = useRef<Array<HTMLButtonElement | null>>([]);
   const t = (value: Translation) => translated(value, language);
+  useLayoutEffect(() => {
+    const shell = container.current?.closest<HTMLElement>('.workspace');
+    if (!shell) return;
+    const previous = shell.style.getPropertyValue('--walkthrough-height');
+    const fit = () => {
+      const top = shell.getBoundingClientRect().top + window.scrollY;
+      shell.style.setProperty('--walkthrough-height', `${Math.max(0, window.innerHeight - top)}px`);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => {
+      window.removeEventListener('resize', fit);
+      if (previous) shell.style.setProperty('--walkthrough-height', previous);
+      else shell.style.removeProperty('--walkthrough-height');
+    };
+  }, []);
   useEffect(() => {
-    setActiveFile(firstPath);
     editor.current?.scrollTo?.({ top: 0 });
     terminal.current?.scrollTo?.({ top: 0 });
-    tabs.current[index]?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-  }, [index, firstPath]);
+  }, [index]);
   function selectBlock(next: number) {
     setLocalBlock(next);
     onBlockChange?.(next);
   }
-  function selectFile(path: string) {
-    setActiveFile(path);
-    const file = files.current.get(path),
-      container = editor.current;
-    if (file && container) container.scrollTo?.({ top: file.offsetTop, behavior: 'smooth' });
-  }
   return (
     <section
-      className="studio-fullscreen"
-      aria-label={t(both('ArtGuard code studio', 'Студия кода ArtGuard'))}
+      className="code-walkthrough"
+      ref={container}
+      aria-label={t(both('Blockchain code walkthrough', 'Разбор кода блокчейна'))}
     >
-      <header className="studio-topbar">
-        <div className="studio-brand">
-          <span className="studio-brand-icon">
-            <Code2 size={20} />
-          </span>
-          <div>
-            <strong>
-              ArtGuard<span>.dev</span>
-            </strong>
-            <small>BLOCKCHAIN WORKSPACE</small>
+      <div className="walkthrough-heading">
+        <h1>{t(both('Blockchain: code and output', 'Блокчейн: код и вывод'))}</h1>
+        {showLanguageControl && (
+          <div className="technical-language" role="group" aria-label="Explanation language">
+            {(['en', 'ru'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={language === value}
+                onClick={() => {
+                  setLocalLanguage(value);
+                  onLanguageChange?.(value);
+                }}
+              >
+                {value.toUpperCase()}
+              </button>
+            ))}
           </div>
-        </div>
-        <span className="studio-network">
-          <span /> LOCAL TESTNET · 31337
-        </span>
-        <div className="studio-top-actions">
-          {showLanguageControl && (
-            <div className="studio-language" role="group" aria-label="Explanation language">
-              {(['en', 'ru'] as const).map((value) => (
-                <button
-                  type="button"
-                  key={value}
-                  aria-pressed={language === value}
-                  onClick={() => {
-                    setLocalLanguage(value);
-                    onLanguageChange?.(value);
-                  }}
-                >
-                  {value.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          )}
-          <Link
-            className="studio-close"
-            to="/home"
-            aria-label={t(both('Back to ArtGuard', 'Вернуться на сайт'))}
-          >
-            <X size={20} />
-          </Link>
-        </div>
-      </header>
+        )}
+      </div>
       <nav
-        className="studio-progress"
+        className="walkthrough-steps"
         role="tablist"
         aria-label="Execution blocks"
         onKeyDown={(event) => {
@@ -161,14 +139,14 @@ export default function TechnicalCodeWalkthrough({
         }}
       >
         {studioBlocks.map((item, i) => (
-          <div className="studio-progress-item" key={item.id}>
+          <div className="walkthrough-step" key={item.id}>
             <button
-              id={'studio-tab-' + i}
+              id={'code-tab-' + i}
+              type="button"
               role="tab"
               aria-label={`${i + 1}. ${t(item.label)}`}
-              type="button"
               aria-selected={i === index}
-              aria-controls="studio-workspace"
+              aria-controls="code-workspace"
               tabIndex={i === index ? 0 : -1}
               ref={(element) => {
                 tabs.current[i] = element;
@@ -178,156 +156,93 @@ export default function TechnicalCodeWalkthrough({
               <span>{i + 1}</span>
               <strong>{t(item.label)}</strong>
             </button>
-            {i < 3 && <ArrowRight size={18} aria-hidden="true" />}
+            {i < 3 && <ArrowRight size={16} aria-hidden="true" />}
           </div>
         ))}
       </nav>
-      <div className="studio-intro">
-        <div>
-          <span className="studio-step-label">0{index + 1} / 04</span>
-          <h1>{t(block.title)}</h1>
-        </div>
+      <div className="walkthrough-summary">
+        <h2>{t(block.title)}</h2>
         <p>{t(block.text)}</p>
       </div>
       <div
-        className="studio-ide"
-        id="studio-workspace"
+        className="walkthrough-panels"
+        id="code-workspace"
         role="tabpanel"
-        aria-labelledby={'studio-tab-' + index}
+        aria-labelledby={'code-tab-' + index}
       >
-        <div className="studio-editor-pane">
-          <aside className="studio-activity" aria-hidden="true">
-            <Files size={21} />
-            <GitBranch size={20} />
-            <Box size={20} />
-            <span />
-            <LockKeyhole size={17} />
-          </aside>
-          <div className="studio-editor-main">
-            <div
-              className="studio-file-tabs"
-              aria-label={t(both('Source files', 'Файлы исходников'))}
-            >
-              {paths.map((path) => (
-                <button
-                  type="button"
-                  key={path}
-                  aria-pressed={activeFile === path}
-                  onClick={() => selectFile(path)}
-                  title={path}
-                >
-                  <span className={'studio-file-kind kind-' + fileKind(path).toLowerCase()}>
-                    {fileKind(path)}
-                  </span>
-                  {path.split('/').at(-1)}
-                </button>
-              ))}
-            </div>
-            <div className="studio-breadcrumb">
-              artguard <span>›</span> {activeFile} <LockKeyhole size={11} />
-            </div>
-            <div className="studio-editor-scroll" ref={editor}>
-              {paths.map((path) => (
-                <section
-                  className="studio-code-file"
-                  key={path}
-                  ref={(element) => {
-                    if (element) files.current.set(path, element);
-                    else files.current.delete(path);
-                  }}
-                >
-                  <div className="studio-source-heading">
-                    <span>{path}</span>
-                    <a
-                      href={`https://github.com/ONI-COLLI/Artguard/blob/main/${path}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      GitHub ↗
-                    </a>
-                  </div>
-                  {sources
-                    .filter((source) => source.path === path)
-                    .map((source) => (
-                      <pre key={path + source.firstLine} aria-label={path + ':' + source.firstLine}>
-                        <code>
-                          {source.code.split('\n').map((line, i) => (
-                            <span
-                              className={
-                                'studio-code-line' +
-                                (source.highlight && line.includes(source.highlight)
-                                  ? ' is-highlighted'
-                                  : '')
-                              }
-                              key={i}
-                            >
-                              <span className="studio-line-number" aria-hidden="true">
-                                {source.firstLine + i}
-                              </span>
-                              <span>
-                                <SyntaxLine line={line || ' '} />
-                              </span>
+        <section className="walkthrough-code-panel" aria-label={t(both('Code', 'Код'))}>
+          <div className="walkthrough-panel-heading">{t(both('Code', 'Код'))}</div>
+          <div className="walkthrough-code-scroll" ref={editor}>
+            {paths.map((path) => (
+              <section className="walkthrough-code-file" key={path}>
+                <div className="walkthrough-file-heading">
+                  <a
+                    href={`https://github.com/ONI-COLLI/Artguard/blob/main/${path}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {path.split('/').at(-1)}
+                  </a>
+                  <span>{path.slice(0, path.lastIndexOf('/') + 1)}</span>
+                </div>
+                {sources
+                  .filter((source) => source.path === path)
+                  .map((source) => (
+                    <pre key={path + source.firstLine} aria-label={path + ':' + source.firstLine}>
+                      <code>
+                        {source.code.split('\n').map((line, i) => (
+                          <span
+                            className={
+                              'walkthrough-code-line' +
+                              (source.highlight && line.includes(source.highlight)
+                                ? ' is-highlighted'
+                                : '')
+                            }
+                            key={i}
+                          >
+                            <span className="walkthrough-line-number" aria-hidden="true">
+                              {source.firstLine + i}
                             </span>
-                          ))}
-                        </code>
-                      </pre>
-                    ))}
-                </section>
-              ))}
-            </div>
+                            <span>
+                              <SyntaxLine line={line || ' '} />
+                            </span>
+                          </span>
+                        ))}
+                      </code>
+                    </pre>
+                  ))}
+              </section>
+            ))}
           </div>
-        </div>
+        </section>
         <section
-          className="studio-terminal-pane"
+          className="walkthrough-output-panel"
           aria-label={t(both('Terminal and output', 'Терминал и вывод'))}
         >
-          <div className="studio-terminal-toolbar">
-            <span>
-              <Terminal size={14} /> TERMINAL
-            </span>
-            <small>{index === 3 ? 'EXAMPLE + LIVE RPC' : 'EXAMPLE OUTPUT'}</small>
-            <span className="studio-terminal-shell">
-              {steps.some((step) => step.command) ? 'PowerShell' : 'HTTP / RPC'}
-            </span>
+          <div className="walkthrough-panel-heading">
+            <span>{t(both('Terminal output', 'Вывод терминала'))}</span>
+            <small>{index === 3 ? 'EXAMPLE + LIVE RPC' : t(both('Example', 'Пример'))}</small>
           </div>
-          <div className="studio-terminal-scroll" ref={terminal}>
-            <p className="studio-terminal-notice">
-              {t(
-                both(
-                  'Expected output examples. LIVE below reads the real node.',
-                  'Примеры ожидаемого вывода. LIVE ниже читает реальный узел.',
-                ),
-              )}
-            </p>
+          <div className="walkthrough-output-scroll" ref={terminal}>
             {steps.map((step) => (
-              <section className="studio-terminal-session" key={step.id}>
-                <h2>
-                  <span>{t(step.title)}</span>
+              <section className="walkthrough-output-step" key={step.id}>
+                <h3>
+                  {t(step.title)}
                   <small>{t(step.outputKind)}</small>
-                </h2>
+                </h3>
                 {step.command && (
-                  <div className="studio-commands">
-                    {step.command.split('\n').map((line, i) => (
-                      <div
-                        key={i}
-                        className={
-                          line.startsWith('#') ? 'studio-command-comment' : 'studio-command-line'
-                        }
-                      >
-                        {!line.startsWith('#') && <span>PS C:\ArtGuard&gt; </span>}
-                        <code>{line}</code>
-                      </div>
-                    ))}
-                  </div>
+                  <pre className="walkthrough-command">
+                    <code>{step.command}</code>
+                  </pre>
                 )}
-                <pre className="studio-terminal-output">
+                <pre className="walkthrough-output">
                   <code>{step.output}</code>
                 </pre>
               </section>
             ))}
             {index === 1 && (
-              <section className="studio-data-locations">
-                <h2>DATA LOCATIONS</h2>
+              <section className="walkthrough-storage">
+                <h3>{t(both('Storage', 'Хранение'))}</h3>
                 {linearStorage.map((item, i) => (
                   <div key={i}>
                     <strong>{t(item.title)}</strong>
@@ -338,26 +253,13 @@ export default function TechnicalCodeWalkthrough({
               </section>
             )}
             {index === 3 && (
-              <div className="studio-live-section">
-                <span className="studio-live-label">LIVE · ANVIL JSON-RPC</span>
+              <div className="walkthrough-live">
+                <span className="walkthrough-live-label">LIVE · ANVIL JSON-RPC</span>
                 <LiveChainResult language={language} />
               </div>
             )}
-            <div className="studio-terminal-prompt" aria-hidden="true">
-              {steps.some((step) => step.command) ? 'PS C:\\ArtGuard>' : 'rpc>'}
-              <span />
-            </div>
           </div>
         </section>
-        <footer className="studio-statusbar">
-          <span>
-            <GitBranch size={12} /> artguard / local
-          </span>
-          <span>
-            {t(both('Read-only', 'Только чтение'))} · {fileKind(activeFile)} · UTF-8
-          </span>
-          <span>{index + 1} / 4</span>
-        </footer>
       </div>
     </section>
   );

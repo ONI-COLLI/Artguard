@@ -158,11 +158,12 @@ platform, **0.0081** to the creator and **0.0027** to the co-author. Gas is sepa
 
 ## Technical walkthrough with source code
 
-Open **`/#/blockchain-demo`**, without signing in. The fullscreen workspace has
-four blocks across the top: startup, wallet/file, escrow/license and payouts/proof.
-The selected block shows a VS Code-style read-only editor and terminal together.
-Source files have syntax highlighting, original line numbers and file navigation;
-there are no disclosure controls. Use the top tabs or arrow keys to change blocks.
+Open **`/#/blockchain-demo`**, without signing in. The normal site page has four
+blocks across the top: startup, wallet/file, escrow/license and payouts/proof.
+The selected block shows source code and output together. Code has syntax
+highlighting, filenames, directories and original line numbers, without IDE chrome
+or a fullscreen overlay. Code and output scroll inside their panels so the page
+fits the viewport. Use the top tabs or arrow keys to change blocks.
 `?block=1` through `?block=4` opens a specific block. Select **RU** for Russian.
 Terminal and HTTP/RPC examples use placeholders and are explicitly labelled;
 the separate live node result reads the actual running network.
