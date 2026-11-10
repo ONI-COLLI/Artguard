@@ -88,14 +88,20 @@ beforeEach(() => {
     ),
   );
 });
-it('shows the entire source-to-output flow to a guest, including old deep-link URLs', async () => {
+it('maps old links to the selected fullscreen block and preserves its URL and language', async () => {
   mocks.signedIn = false;
   const view = setup('/blockchain-demo?view=code&step=deposit&lang=ru');
-  expect(await screen.findByRole('heading', { name: 'Запуск блокчейна' })).toBeVisible();
-  expect(screen.getByRole('heading', { name: 'Оплата в escrow' })).toBeVisible();
-  expect(screen.getByRole('heading', { name: 'Проверка транзакции на узле' })).toBeVisible();
-  await screen.findByText('No deposit.');
+  expect(
+    await screen.findByRole('heading', { name: 'Депозит → проверка → лицензия' }),
+  ).toBeVisible();
+  expect(screen.getByRole('tab', { name: /Escrow и лицензия/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
   expect(view.container.querySelectorAll('details,summary')).toHaveLength(0);
+  expect(mocks.api).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByRole('tab', { name: /Выплаты и проверка/ }));
+  await screen.findByText('No deposit.');
   expect(
     mocks.api.mock.calls.every(
       ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
@@ -105,7 +111,7 @@ it('shows the entire source-to-output flow to a guest, including old deep-link U
 it('keeps admin tools role-gated on their explicit view', async () => {
   mocks.signedIn = false;
   const guest = setup('/blockchain-demo?tools=1');
-  await screen.findByRole('heading', { name: 'Start the blockchain' });
+  await screen.findByRole('heading', { name: 'Start the local stack' });
   expect(screen.queryByText('Authorized admin sandbox')).not.toBeInTheDocument();
   guest.unmount();
   mocks.signedIn = true;

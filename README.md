@@ -158,23 +158,24 @@ platform, **0.0081** to the creator and **0.0027** to the co-author. Gas is sepa
 
 ## Technical walkthrough with source code
 
-Open **`/#/blockchain-demo`**, without signing in. Read the arrow-connected flow
-from top to bottom: blockchain startup, React/API startup, wallet linking, file
-registration, escrow deposit, release, withdrawal and verification. Every code
-excerpt and expected output is immediately visible; there are no disclosure
-controls or step-selection buttons. Select **RU** for Russian explanations.
+Open **`/#/blockchain-demo`**, without signing in. The fullscreen workspace has
+four blocks across the top: startup, wallet/file, escrow/license and payouts/proof.
+The selected block shows a VS Code-style read-only editor and terminal together.
+Source files have syntax highlighting, original line numbers and file navigation;
+there are no disclosure controls. Use the top tabs or arrow keys to change blocks.
+`?block=1` through `?block=4` opens a specific block. Select **RU** for Russian.
 Terminal and HTTP/RPC examples use placeholders and are explicitly labelled;
 the separate live node result reads the actual running network.
 
-The storage map distinguishes browser session data, SQLite rows, original files,
-Anvil contract storage and generated TXT license records. It documents paths and
+The storage map distinguishes SQLite rows, original files, Anvil contract storage
+and signing-key locations, and explains generated TXT license records. It documents paths and
 formats without displaying runtime database contents or private keys. The
 diagrams explain the implementation and do not connect a wallet,
 sign or send a transaction. The separate live verification panel reads RPC.
 
 ## Verify a blockchain purchase
 
-Open **`/#/blockchain-demo`** and use **Live node result**. Paste the
+Open **`/#/blockchain-demo?block=4`** and use **Live node result** in the terminal. Paste the
 **deposit** hash, or leave it empty for the latest deposit. Verification reads
 Anvil JSON-RPC: successful receipt, canonical block, deployed code, decoded input,
 events, escrow state, licence validity and revenue allocations. Deposit, release

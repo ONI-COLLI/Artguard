@@ -19,6 +19,48 @@ export default function BlockchainDemonstration() {
   const { user } = useData();
   const tools = params.get('tools') === '1' && !!user?.isAdmin && user.emailVerified;
   const archive = params.get('legacy') === '1';
+  const requestedBlock = Number(params.get('block'));
+  const oldStep = params.get('step') || '';
+  const mapped = ['chain', 'client', 'install'].includes(oldStep)
+    ? 0
+    : ['wallet', 'demo-wallet', 'file', 'fingerprint', 'register', 'storage'].includes(oldStep)
+      ? 1
+      : ['quote', 'deposit', 'delivery', 'release', 'refund'].includes(oldStep)
+        ? 2
+        : ['withdraw', 'verify'].includes(oldStep)
+          ? 3
+          : 0;
+  const block =
+    Number.isInteger(requestedBlock) && requestedBlock >= 1 && requestedBlock <= 4
+      ? requestedBlock - 1
+      : mapped;
+  if (!tools && !archive)
+    return (
+      <TechnicalCodeWalkthrough
+        language={language}
+        block={block}
+        onLanguageChange={(value) =>
+          setParams(
+            (previous) => {
+              const next = new URLSearchParams(previous);
+              next.set('lang', value);
+              return next;
+            },
+            { replace: true },
+          )
+        }
+        onBlockChange={(value) =>
+          setParams(
+            (previous) => {
+              const next = new URLSearchParams(previous);
+              next.set('block', String(value + 1));
+              return next;
+            },
+            { replace: true },
+          )
+        }
+      />
+    );
   return (
     <div className="blockchain-demo linear-demo">
       <PageHeading

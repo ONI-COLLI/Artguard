@@ -129,6 +129,49 @@ export const linearSteps = [
   },
 ];
 
+export const studioBlocks = [
+  {
+    id: 'startup',
+    label: both('Start', 'Запуск'),
+    title: both('Start the local stack', 'Запуск локального стека'),
+    text: both(
+      'Anvil first, then React and Express. Commands and expected output are in the terminal.',
+      'Сначала Anvil, затем React и Express. Команды и ожидаемый вывод — в терминале.',
+    ),
+    steps: ['chain', 'client'],
+  },
+  {
+    id: 'identity',
+    label: both('Wallet & file', 'Кошелёк и файл'),
+    title: both('Wallet → file → fingerprint', 'Кошелёк → файл → отпечаток'),
+    text: both(
+      'A signature links the wallet. The original stays on disk; its SHA-256 is registered in the contract.',
+      'Подпись привязывает кошелёк. Оригинал остаётся на диске, его SHA-256 регистрируется в контракте.',
+    ),
+    steps: ['wallet', 'file'],
+  },
+  {
+    id: 'purchase',
+    label: both('Escrow & license', 'Escrow и лицензия'),
+    title: both('Deposit → review → license', 'Депозит → проверка → лицензия'),
+    text: both(
+      'Escrow holds the payment. Acceptance activates the license and allocates revenue.',
+      'Escrow удерживает оплату. Принятие активирует лицензию и начисляет доли.',
+    ),
+    steps: ['deposit', 'release'],
+  },
+  {
+    id: 'evidence',
+    label: both('Payouts & proof', 'Выплаты и проверка'),
+    title: both('Withdraw → verify on the node', 'Вывод → проверка на узле'),
+    text: both(
+      'Each author withdraws their own credit. The live section reads a real receipt from Anvil.',
+      'Каждый автор выводит своё начисление. Секция LIVE читает настоящую квитанцию из Anvil.',
+    ),
+    steps: ['withdraw', 'verify'],
+  },
+];
+
 export const linearStorage = [
   {
     title: both('Accounts and orders', 'Аккаунты и сделки'),
