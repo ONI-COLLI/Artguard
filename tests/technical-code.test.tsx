@@ -4,16 +4,25 @@ import userEvent from '@testing-library/user-event';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import TechnicalCode from '../src/components/technical-code';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { linearSteps } from '../src/lib/linear-walkthrough';
 import { technicalSteps } from '../src/lib/technical-source';
 const mocks = vi.hoisted(() => ({ api: vi.fn() }));
 vi.mock('../src/lib/api', () => ({ api: mocks.api }));
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.api.mockResolvedValue({
+    status: 'not_found',
+    checkedAt: '2026-11-10T12:00:00Z',
+    message: 'No local deposit.',
+    checks: [],
+    orders: [],
+  });
 });
 
 it('shows current source lines and preserves the startup and escrow/withdrawal boundaries', () => {
   expect(technicalSteps).toHaveLength(15);
-  for (const step of technicalSteps)
+  for (const step of [...technicalSteps, ...linearSteps])
     for (const excerpt of step.sources) {
       expect(excerpt.path).not.toMatch(/\.env|private\.json|runtime\/|data\//);
       const lines = readFileSync(resolve(excerpt.path), 'utf8')
@@ -34,67 +43,41 @@ it('shows current source lines and preserves the startup and escrow/withdrawal b
     'balances[msg.sender] = 0',
   );
 });
-it('keeps the default screen short and reveals code only on request', async () => {
-  render(<TechnicalCode />);
-  const nav = within(screen.getByRole('navigation', { name: 'Walkthrough steps' }));
-  expect(nav.getAllByRole('button')).toHaveLength(6);
-  expect(screen.getByRole('heading', { name: 'Start the app and blockchain' })).toBeVisible();
-  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
-  for (const item of screen.getAllByText('data/artguard.sqlite')) expect(item).not.toBeVisible();
-  expect(mocks.api).not.toHaveBeenCalled();
-  await userEvent.click(screen.getByText('Show code'));
-  expect(screen.getByText(/npm ci/, { selector: 'code' })).toBeVisible();
-  expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /Wallet/ }));
-  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
+function setup() {
+  return render(
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })}
+    >
+      <TechnicalCode />
+    </QueryClientProvider>,
+  );
+}
+it('shows every code step and output immediately without navigation or disclosure controls', async () => {
+  const view = setup();
+  await screen.findByText('No local deposit.');
+  expect(screen.getByRole('heading', { name: 'Start the blockchain' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Verify the transaction on the node' })).toBeVisible();
+  expect(screen.getByText('data/artguard.sqlite')).toBeVisible();
+  expect(screen.getByText(/npm run chain/, { selector: 'code' })).toBeVisible();
+  expect(screen.getByText(/EscrowFunded →/, { selector: 'code' })).toBeVisible();
+  expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(8);
+  expect(view.container.querySelectorAll('details, summary, [hidden]')).toHaveLength(0);
+  expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  expect(
+    mocks.api.mock.calls.every(
+      ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
+    ),
+  ).toBe(true);
 });
-it('keeps wallet, storage and escrow details accessible behind concise disclosures', async () => {
-  render(<TechnicalCode />);
-  const nav = within(screen.getByRole('navigation', { name: 'Walkthrough steps' }));
-  await userEvent.click(nav.getByRole('button', { name: /Wallet/ }));
-  expect(screen.getByText('Linking a wallet does not authorize a payment.')).toBeVisible();
-  await userEvent.click(screen.getByText('Show code'));
-  await userEvent.click(
-    within(screen.getByRole('navigation', { name: 'Code topics' })).getByRole('button', {
-      name: 'Test wallets',
-    }),
-  );
-  expect(screen.getByText(/This prototype mode is custodial/)).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /File/ }));
-  await userEvent.click(screen.getByText('Where data is stored'));
-  expect(screen.getByText('Downloadable license record')).toBeVisible();
-  expect(screen.getByText('data/uploads/<generated filename>')).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /Escrow/ }));
-  expect(screen.getByText('Delivery: 72h · Review: 24h · Dispute: 7 days')).toBeVisible();
-  await userEvent.click(screen.getByText('Show code'));
-  await userEvent.click(
-    within(screen.getByRole('navigation', { name: 'Code topics' })).getByRole('button', {
-      name: 'Refund',
-      exact: true,
-    }),
-  );
-  expect(screen.getByText(/separately calls withdrawRefund/)).toBeVisible();
+it('distinguishes expected terminal and RPC examples from the real node result in both languages', async () => {
+  setup();
+  await screen.findByText('No local deposit.');
+  expect(screen.getAllByRole('heading', { name: 'Terminal example' })).toHaveLength(2);
+  expect(screen.getByText(/Output examples show the expected format/)).toBeVisible();
   await userEvent.click(screen.getByRole('button', { name: 'RU' }));
-  expect(screen.getByRole('heading', { name: 'Оплати через escrow' })).toBeVisible();
-  expect(mocks.api).not.toHaveBeenCalled();
-});
-it('shows live verification only in the last step and checks connectivity only when requested', async () => {
-  mocks.api.mockImplementation((path: string) =>
-    path === '/health' ? Promise.resolve({ ok: true }) : Promise.reject(new Error('Node offline')),
-  );
-  render(<TechnicalCode proof={<p>Live verification placeholder</p>} />);
-  expect(screen.queryByText('Live verification placeholder')).not.toBeInTheDocument();
-  await userEvent.click(screen.getByText('Show code'));
-  await userEvent.click(screen.getByRole('button', { name: 'Check live connection' }));
-  expect(await screen.findByText('Node offline')).toBeVisible();
-  expect(mocks.api.mock.calls.map((call) => call[0]).sort()).toEqual(
-    ['/health', '/blockchain/status', '/blockchain/marketplace'].sort(),
-  );
-  await userEvent.click(
-    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getByRole('button', {
-      name: /Verify/,
-    }),
-  );
-  expect(screen.getByText('Live verification placeholder')).toBeVisible();
-  expect(mocks.api.mock.calls.every((call) => !call[1]?.method)).toBe(true);
+  expect(screen.getAllByRole('heading', { name: 'Пример терминала' })).toHaveLength(2);
+  expect(screen.getByRole('heading', { name: 'Настоящие данные узла' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Вывод долей авторам' })).toBeVisible();
+  expect(linearSteps).toHaveLength(8);
+  expect(linearSteps.every((step) => /example/.test(step.outputKind[0]))).toBe(true);
 });

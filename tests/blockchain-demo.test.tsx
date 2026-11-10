@@ -7,6 +7,9 @@ import BlockchainDemo from '../src/pages/blockchain-demo';
 
 const mocks = vi.hoisted(() => ({ api: vi.fn(), allowed: true, verified: true, signedIn: true }));
 vi.mock('../src/lib/api', () => ({ api: mocks.api }));
+vi.mock('../src/components/blockchain-sandbox', () => ({
+  BlockchainSandbox: () => <p>Authorized admin sandbox</p>,
+}));
 vi.mock('../src/lib/workspace', () => ({
   useData: () => ({
     user: mocks.signedIn
@@ -76,68 +79,46 @@ beforeEach(() => {
       path.startsWith('/blockchain/demo-proof')
         ? snapshot
         : {
-            status: 'verified',
-            message: 'RPC verified.',
-            checks: [{ label: 'Deposit succeeded at a configured escrow contract', passed: true }],
+            status: 'not_found',
+            message: 'No deposit.',
+            checks: [],
             orders: [],
             checkedAt: '2026-11-10T10:00:00Z',
           },
     ),
   );
 });
-it('starts with six concise steps for guests and no automatic proof or admin requests', async () => {
+it('shows the entire source-to-output flow to a guest, including old deep-link URLs', async () => {
   mocks.signedIn = false;
-  setup();
-  expect(
-    await screen.findByRole('heading', { name: 'Start the app and blockchain' }),
-  ).toBeVisible();
-  expect(
-    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getAllByRole('button'),
-  ).toHaveLength(6);
-  expect(screen.queryByText('Admin tools')).not.toBeInTheDocument();
-  expect(screen.queryByRole('heading', { name: 'Live blockchain check' })).not.toBeInTheDocument();
-  expect(mocks.api).not.toHaveBeenCalled();
-});
-it('preserves Russian deep links and reads RPC only when the verification step opens', async () => {
-  mocks.signedIn = false;
-  setup('/blockchain-demo?view=code&step=deposit&lang=ru');
-  expect(await screen.findByRole('heading', { name: 'Оплати через escrow' })).toBeVisible();
-  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
-  expect(mocks.api).not.toHaveBeenCalled();
-  await userEvent.click(
-    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getByRole('button', {
-      name: /Проверка/,
-    }),
-  );
-  expect(await screen.findByText('1 / 1')).toBeVisible();
-  expect(screen.getByRole('heading', { name: 'Проверь оплату на узле' })).toBeVisible();
-  expect(screen.getByText('Оплата успешно дошла до escrow-контракта')).not.toBeVisible();
-  await userEvent.click(screen.getByText('Технические проверки'));
-  expect(screen.getByText('Оплата успешно дошла до escrow-контракта')).toBeVisible();
+  const view = setup('/blockchain-demo?view=code&step=deposit&lang=ru');
+  expect(await screen.findByRole('heading', { name: 'Запуск блокчейна' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Оплата в escrow' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Проверка транзакции на узле' })).toBeVisible();
+  await screen.findByText('No deposit.');
+  expect(view.container.querySelectorAll('details,summary')).toHaveLength(0);
   expect(
     mocks.api.mock.calls.every(
       ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
     ),
   ).toBe(true);
 });
-it('keeps the older payment archive optional inside verification', async () => {
-  setup('/blockchain-demo?step=verify');
-  await screen.findByText('1 / 1');
-  expect(mocks.api.mock.calls.some(([path]) => path === '/blockchain/demo-proof')).toBe(false);
-  await userEvent.click(screen.getByText('Earlier direct payments'));
+it('keeps admin tools role-gated on their explicit view', async () => {
+  mocks.signedIn = false;
+  const guest = setup('/blockchain-demo?tools=1');
+  await screen.findByRole('heading', { name: 'Start the blockchain' });
+  expect(screen.queryByText('Authorized admin sandbox')).not.toBeInTheDocument();
+  guest.unmount();
+  mocks.signedIn = true;
+  setup('/blockchain-demo?tools=1');
+  expect(await screen.findByText('Authorized admin sandbox')).toBeVisible();
+});
+it('preserves the direct-payment verifier on its explicit legacy URL', async () => {
+  setup('/blockchain-demo?legacy=1');
   expect(await screen.findByText('Verified directly on the local chain')).toBeVisible();
   expect(screen.getByText('0xproof')).toBeVisible();
-  expect(mocks.api.mock.calls.every(([, options]) => !options?.method)).toBe(true);
-});
-it('retains presentation mode and hides admin tools until explicitly expanded', async () => {
-  setup();
-  await screen.findByRole('heading', { name: 'Start the app and blockchain' });
-  expect(screen.getByText('Admin tools')).toBeVisible();
-  expect(mocks.api).not.toHaveBeenCalled();
-  await userEvent.click(screen.getByRole('button', { name: 'Presentation view' }));
-  await userEvent.keyboard('{Escape}');
-  expect(screen.getByRole('button', { name: 'Presentation view' })).toHaveAttribute(
-    'aria-pressed',
-    'false',
-  );
+  expect(
+    mocks.api.mock.calls.every(
+      ([path, options]) => path === '/blockchain/demo-proof' && !options?.method,
+    ),
+  ).toBe(true);
 });

@@ -14,15 +14,15 @@ local test ETH.
 
 ## Course deliverables
 
-| Item | Link or status |
-| --- | --- |
-| Report | [Team03_FP_Report.pdf](deliverables/final-project/Team03_FP_Report.pdf): 15 main-text pages; title, contents, references and appendices are separate |
-| Presentation | [PDF for Moodle](deliverables/final-project/Team03_FP_Presentation.pdf) · [Editable PowerPoint](deliverables/final-project/Team03_FP_Presentation.pptx) |
-| Defence speech | [English speaker text](deliverables/final-project/Team03_FP_Speech.pdf), with financial figures from the same unpaid-founder model |
-| Demo video | [Download Team03_FP_Demo.mp4](deliverables/three-minute/Team03_FP_Demo.mp4): exactly 3:00 with English on-screen explanations |
-| Required university OneDrive sharing URL | **Pending upload by the team.** The GitHub MP4 is a convenient copy, not the required institutional sharing URL. |
-| Video evidence | [Saved run and test scope](deliverables/three-minute/Team03_FP_Demo_evidence.json) · [Media validation](deliverables/three-minute/Team03_FP_Demo_validation.json) · [English captions](deliverables/three-minute/Team03_FP_Demo.srt) |
-| Submission checklist | [Remaining access, contribution and self-evaluation requirements](docs/FINAL_SUBMISSION.md) |
+| Item                                     | Link or status                                                                                                                                                                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Report                                   | [Team03_FP_Report.pdf](deliverables/final-project/Team03_FP_Report.pdf): 15 main-text pages; title, contents, references and appendices are separate                                                                                 |
+| Presentation                             | [PDF for Moodle](deliverables/final-project/Team03_FP_Presentation.pdf) · [Editable PowerPoint](deliverables/final-project/Team03_FP_Presentation.pptx)                                                                              |
+| Defence speech                           | [English speaker text](deliverables/final-project/Team03_FP_Speech.pdf), with financial figures from the same unpaid-founder model                                                                                                   |
+| Demo video                               | [Download Team03_FP_Demo.mp4](deliverables/three-minute/Team03_FP_Demo.mp4): exactly 3:00 with English on-screen explanations                                                                                                        |
+| Required university OneDrive sharing URL | **Pending upload by the team.** The GitHub MP4 is a convenient copy, not the required institutional sharing URL.                                                                                                                     |
+| Video evidence                           | [Saved run and test scope](deliverables/three-minute/Team03_FP_Demo_evidence.json) · [Media validation](deliverables/three-minute/Team03_FP_Demo_validation.json) · [English captions](deliverables/three-minute/Team03_FP_Demo.srt) |
+| Submission checklist                     | [Remaining access, contribution and self-evaluation requirements](docs/FINAL_SUBMISSION.md)                                                                                                                                          |
 
 The video shows actual local contract deployment, escrow deposit, seller delivery,
 buyer acceptance, an active licence, a co-author withdrawal, direct chain checks,
@@ -130,11 +130,11 @@ that a new CI run passed.
 
 ## Stack and contract responsibilities
 
-| Layer | Implementation | Responsibility |
-| --- | --- | --- |
-| Client | React 19, TypeScript, Vite, React Router, TanStack Query, wagmi/viem | Project forms, catalogue, licence checkout, wallet and feedback |
-| Server | Node.js, Express 5, SQLite, Zod | Accounts, per-tab sessions, files, signed quotes, access checks and accounting copies |
-| Local chain | Anvil EVM, chain 31337, Solidity, OpenZeppelin | Fingerprints, escrow conditions, wallet licence validity, revenue credits and withdrawals |
+| Layer       | Implementation                                                       | Responsibility                                                                            |
+| ----------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Client      | React 19, TypeScript, Vite, React Router, TanStack Query, wagmi/viem | Project forms, catalogue, licence checkout, wallet and feedback                           |
+| Server      | Node.js, Express 5, SQLite, Zod                                      | Accounts, per-tab sessions, files, signed quotes, access checks and accounting copies     |
+| Local chain | Anvil EVM, chain 31337, Solidity, OpenZeppelin                       | Fingerprints, escrow conditions, wallet licence validity, revenue credits and withdrawals |
 
 - [`ArtworkRegistry.sol`](contracts/ArtworkRegistry.sol) records file/terms hashes,
   the registering wallet and time. Original files and account profiles stay off-chain.
@@ -158,29 +158,30 @@ platform, **0.0081** to the creator and **0.0027** to the co-author. Gas is sepa
 
 ## Technical walkthrough with source code
 
-Open **`/#/blockchain-demo`**, without signing in. Six short steps cover startup,
-wallets, files, escrow, licenses and verification. Source code and storage paths
-expand on request; live payment verification loads only in the final step.
-The code covers SIWE linking, custodial demo signing and escrow settlement.
-Select **RU** for Russian explanations. Direct sections use `&step=wallet`,
-`&step=storage` or `&step=deposit`; `&lang=ru` preserves the explanation language.
+Open **`/#/blockchain-demo`**, without signing in. Read the arrow-connected flow
+from top to bottom: blockchain startup, React/API startup, wallet linking, file
+registration, escrow deposit, release, withdrawal and verification. Every code
+excerpt and expected output is immediately visible; there are no disclosure
+controls or step-selection buttons. Select **RU** for Russian explanations.
+Terminal and HTTP/RPC examples use placeholders and are explicitly labelled;
+the separate live node result reads the actual running network.
 
 The storage map distinguishes browser session data, SQLite rows, original files,
 Anvil contract storage and generated TXT license records. It documents paths and
 formats without displaying runtime database contents or private keys. The
-interactive diagrams explain the implementation and do not connect a wallet,
+diagrams explain the implementation and do not connect a wallet,
 sign or send a transaction. The separate live verification panel reads RPC.
 
 ## Verify a blockchain purchase
 
-Open **`/#/blockchain-demo`** and use **Verify a real escrow payment**. Paste the
+Open **`/#/blockchain-demo`** and use **Live node result**. Paste the
 **deposit** hash, or leave it empty for the latest deposit. Verification reads
 Anvil JSON-RPC: successful receipt, canonical block, deployed code, decoded input,
 events, escrow state, licence validity and revenue allocations. Deposit, release
 and withdrawal are distinct transactions. Earlier direct-payment proofs are in
-the explicitly labelled archive.
-Each verification result expands to explain which node values are compared;
-failed checks stay failed and are not replaced with illustrated results.
+`/#/blockchain-demo?legacy=1` verifier. Failed checks stay failed and are not
+replaced with the expected output examples. Technical admin tools remain
+role-gated on `/#/blockchain-demo?tools=1`.
 
 The saved recording's [canonical receipts](deliverables/three-minute/canonical-receipts.json)
 and [on-chain proof](deliverables/three-minute/on-chain-proof.json) identify its
