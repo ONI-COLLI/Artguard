@@ -4,6 +4,47 @@
   gap: 15px;
   align-items: start;
 }
+.escrow-proof.is-compact {
+  padding: 18px 0 0;
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px solid #363636;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.escrow-proof.is-compact .escrow-proof-heading h2 {
+  font-size: 16px;
+}
+.escrow-proof.is-compact .field-hint {
+  font-size: 10px;
+  color: #777;
+}
+.escrow-proof.is-compact .escrow-proof-form {
+  margin-top: 14px;
+}
+.escrow-proof.is-compact .escrow-proof-order details {
+  padding: 10px 0;
+  margin: 0;
+}
+.escrow-proof.is-compact .compact-proof-evidence {
+  padding: 8px 0;
+  margin: 8px 0;
+  border: 0;
+}
+.escrow-proof.is-compact .compact-proof-evidence > summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: #aaa;
+}
+.escrow-proof:not(.is-compact) .compact-proof-evidence {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.escrow-proof:not(.is-compact) .compact-proof-evidence > summary {
+  display: none;
+}
 .escrow-proof .technical-language {
   display: flex;
   gap: 3px;

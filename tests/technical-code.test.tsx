@@ -34,67 +34,67 @@ it('shows current source lines and preserves the startup and escrow/withdrawal b
     'balances[msg.sender] = 0',
   );
 });
-it('lets a guest study actual startup, fingerprint and contract code without sending requests', async () => {
+it('keeps the default screen short and reveals code only on request', async () => {
   render(<TechnicalCode />);
-  expect(
-    screen.getByRole('heading', { name: '1. Install and build the actual project' }),
-  ).toBeVisible();
+  const nav = within(screen.getByRole('navigation', { name: 'Walkthrough steps' }));
+  expect(nav.getAllByRole('button')).toHaveLength(6);
+  expect(screen.getByRole('heading', { name: 'Start the app and blockchain' })).toBeVisible();
+  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
+  for (const item of screen.getAllByText('data/artguard.sqlite')) expect(item).not.toBeVisible();
+  expect(mocks.api).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByText('Show code'));
   expect(screen.getByText(/npm ci/, { selector: 'code' })).toBeVisible();
-  const nav = within(screen.getByRole('navigation', { name: 'Code walkthrough steps' }));
-  await userEvent.click(nav.getByRole('button', { name: /File hash/ }));
-  expect(
-    screen.getByRole('heading', { name: '7. Upload a file and calculate its fingerprint' }),
-  ).toBeVisible();
-  expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
-    'href',
-    expect.stringContaining('server/artwork.routes.ts#L'),
-  );
-  await userEvent.click(screen.getByRole('button', { name: 'RU' }));
-  expect(
-    screen.getByRole('heading', { name: '7. Загрузить файл и вычислить отпечаток' }),
-  ).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /Вывод/ }));
-  expect(
-    screen.getByRole('heading', { name: '14. Вывести начисление автора или соавтора' }),
-  ).toBeVisible();
-  expect(mocks.api).not.toHaveBeenCalled();
+  expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
+  await userEvent.click(nav.getByRole('button', { name: /Wallet/ }));
+  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
 });
-it('explains external and hosted wallets, actual storage formats and escrow branches without signing', async () => {
+it('keeps wallet, storage and escrow details accessible behind concise disclosures', async () => {
   render(<TechnicalCode />);
-  await userEvent.click(screen.getByRole('button', { name: /How wallets connect/ }));
-  expect(screen.getByRole('heading', { name: /4\. Connect and prove/ })).toBeVisible();
-  expect(screen.getByText(/The external private key stays in the wallet/)).toBeVisible();
-  const nav = within(screen.getByRole('navigation', { name: 'Code walkthrough steps' }));
-  await userEvent.click(nav.getByRole('button', { name: /Test wallets/ }));
+  const nav = within(screen.getByRole('navigation', { name: 'Walkthrough steps' }));
+  await userEvent.click(nav.getByRole('button', { name: /Wallet/ }));
+  expect(screen.getByText('Linking a wallet does not authorize a payment.')).toBeVisible();
+  await userEvent.click(screen.getByText('Show code'));
+  await userEvent.click(
+    within(screen.getByRole('navigation', { name: 'Code topics' })).getByRole('button', {
+      name: 'Test wallets',
+    }),
+  );
   expect(screen.getByText(/This prototype mode is custodial/)).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /Data storage/ }));
-  const map = within(screen.getByRole('region', { name: 'Data storage map' }));
-  expect(map.getAllByRole('article')).toHaveLength(8);
-  const document = map
-    .getByRole('heading', { name: 'Downloadable license record' })
-    .closest('article')!;
-  await userEvent.click(within(document).getByText('Contents and access'));
-  expect(within(document).getByText(/TXT generated on request/)).toBeVisible();
-  expect(within(document).getByText(/It is not an NFT/)).toBeVisible();
-  await userEvent.click(nav.getByRole('button', { name: /Deposit/ }));
-  await userEvent.click(screen.getByRole('button', { name: /2\. Delivery \/ dispute/ }));
-  expect(screen.getByRole('heading', { name: /11\. Confirm delivery/ })).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: /Alternative: refund/ }));
+  await userEvent.click(nav.getByRole('button', { name: /File/ }));
+  await userEvent.click(screen.getByText('Where data is stored'));
+  expect(screen.getByText('Downloadable license record')).toBeVisible();
+  expect(screen.getByText('data/uploads/<generated filename>')).toBeVisible();
+  await userEvent.click(nav.getByRole('button', { name: /Escrow/ }));
+  expect(screen.getByText('Delivery: 72h · Review: 24h · Dispute: 7 days')).toBeVisible();
+  await userEvent.click(screen.getByText('Show code'));
+  await userEvent.click(
+    within(screen.getByRole('navigation', { name: 'Code topics' })).getByRole('button', {
+      name: 'Refund',
+      exact: true,
+    }),
+  );
   expect(screen.getByText(/separately calls withdrawRefund/)).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: 'RU' }));
+  expect(screen.getByRole('heading', { name: 'Оплати через escrow' })).toBeVisible();
   expect(mocks.api).not.toHaveBeenCalled();
 });
-it('checks live connectivity only on request, reports failures and never sends a transaction', async () => {
+it('shows live verification only in the last step and checks connectivity only when requested', async () => {
   mocks.api.mockImplementation((path: string) =>
     path === '/health' ? Promise.resolve({ ok: true }) : Promise.reject(new Error('Node offline')),
   );
-  render(<TechnicalCode />);
-  expect(mocks.api).not.toHaveBeenCalled();
+  render(<TechnicalCode proof={<p>Live verification placeholder</p>} />);
+  expect(screen.queryByText('Live verification placeholder')).not.toBeInTheDocument();
+  await userEvent.click(screen.getByText('Show code'));
   await userEvent.click(screen.getByRole('button', { name: 'Check live connection' }));
   expect(await screen.findByText('Node offline')).toBeVisible();
-  expect(screen.getByText('● Node API: ready')).toBeVisible();
-  expect(screen.getByText('○ License marketplace: unavailable')).toBeVisible();
-  expect(mocks.api.mock.calls.map((c) => c[0]).sort()).toEqual(
+  expect(mocks.api.mock.calls.map((call) => call[0]).sort()).toEqual(
     ['/health', '/blockchain/status', '/blockchain/marketplace'].sort(),
   );
-  expect(mocks.api.mock.calls.every((c) => !c[1]?.method)).toBe(true);
+  await userEvent.click(
+    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getByRole('button', {
+      name: /Verify/,
+    }),
+  );
+  expect(screen.getByText('Live verification placeholder')).toBeVisible();
+  expect(mocks.api.mock.calls.every((call) => !call[1]?.method)).toBe(true);
 });

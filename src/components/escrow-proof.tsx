@@ -12,11 +12,13 @@ export function EscrowProof({
   onLanguageChange,
   onExplain,
   showLanguageControl = true,
+  compact = false,
 }: {
   language?: CodeLanguage;
   onLanguageChange?: (language: CodeLanguage) => void;
   onExplain?: (id: string) => void;
   showLanguageControl?: boolean;
+  compact?: boolean;
 } = {}) {
   const [localLanguage, setLocalLanguage] = useState<CodeLanguage>('en');
   const language = suppliedLanguage ?? localLanguage;
@@ -33,9 +35,17 @@ export function EscrowProof({
   });
   const data = query.data && Array.isArray(query.data.orders) ? query.data : null;
   return (
-    <section className="panel escrow-proof">
+    <section className={'panel escrow-proof' + (compact ? ' is-compact' : '')}>
       <div className="escrow-proof-heading">
-        <h2>{t(both('Verify a real escrow payment', 'Проверить настоящую оплату escrow'))}</h2>
+        {!compact && (
+          <h2>
+            {t(
+              compact
+                ? both('Live blockchain check', 'Проверка в блокчейне')
+                : both('Verify a real escrow payment', 'Проверить настоящую оплату escrow'),
+            )}
+          </h2>
+        )}
         {showLanguageControl && (
           <div className="technical-language" role="group" aria-label="Proof explanation language">
             {(['en', 'ru'] as const).map((value) => (
@@ -54,38 +64,42 @@ export function EscrowProof({
           </div>
         )}
       </div>
-      <p className="muted">
-        {t(
-          both(
-            'Reads the local blockchain directly. No login or database purchase record is required.',
-            'Данные читаются напрямую из локального блокчейна. Вход и запись покупки в базе не требуются.',
-          ),
-        )}
-      </p>
-      <div className="escrow-proof-explanation">
-        <strong>{t(both('What are the checks below?', 'Что означают пункты ниже?'))}</strong>
-        <p>
+      {!compact && (
+        <p className="muted">
           {t(
             both(
-              'They are verification results for an existing payment, not steps to buy. Each compares data read from the node: transaction → block → contract state → release or refund events. Expand a result to see what is compared.',
-              'Это результаты проверки существующей оплаты, а не шаги покупки. Каждый пункт сверяет данные узла: транзакция → блок → состояние контракта → события завершения или возврата. Раскройте пункт, чтобы увидеть, что сравнивается.',
+              'Reads the local blockchain directly. No login or database purchase record is required.',
+              'Данные читаются напрямую из локального блокчейна. Вход и запись покупки в базе не требуются.',
             ),
           )}
         </p>
-        {onExplain && (
-          <div className="actions">
-            <button type="button" className="text-button" onClick={() => onExplain('wallet')}>
-              {t(both('Wallet connection + code', 'Подключение кошелька + код'))}
-            </button>
-            <button type="button" className="text-button" onClick={() => onExplain('deposit')}>
-              {t(both('Escrow lifecycle + code', 'Жизненный цикл escrow + код'))}
-            </button>
-            <button type="button" className="text-button" onClick={() => onExplain('storage')}>
-              {t(both('Where data is stored', 'Где хранятся данные'))}
-            </button>
-          </div>
-        )}
-      </div>
+      )}
+      {!compact && (
+        <div className="escrow-proof-explanation">
+          <strong>{t(both('What are the checks below?', 'Что означают пункты ниже?'))}</strong>
+          <p>
+            {t(
+              both(
+                'They are verification results for an existing payment, not steps to buy. Each compares data read from the node: transaction → block → contract state → release or refund events. Expand a result to see what is compared.',
+                'Это результаты проверки существующей оплаты, а не шаги покупки. Каждый пункт сверяет данные узла: транзакция → блок → состояние контракта → события завершения или возврата. Раскройте пункт, чтобы увидеть, что сравнивается.',
+              ),
+            )}
+          </p>
+          {onExplain && (
+            <div className="actions">
+              <button type="button" className="text-button" onClick={() => onExplain('wallet')}>
+                {t(both('Wallet connection + code', 'Подключение кошелька + код'))}
+              </button>
+              <button type="button" className="text-button" onClick={() => onExplain('deposit')}>
+                {t(both('Escrow lifecycle + code', 'Жизненный цикл escrow + код'))}
+              </button>
+              <button type="button" className="text-button" onClick={() => onExplain('storage')}>
+                {t(both('Where data is stored', 'Где хранятся данные'))}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <form
         className="escrow-proof-form"
         onSubmit={(e) => {
@@ -96,10 +110,12 @@ export function EscrowProof({
       >
         <label className="field-label" htmlFor="escrow-proof-hash">
           {t(
-            both(
-              'Deposit transaction hash (leave empty for the latest)',
-              'Хеш транзакции депозита (пусто — последняя оплата)',
-            ),
+            compact
+              ? both('Deposit transaction hash', 'Хеш транзакции депозита')
+              : both(
+                  'Deposit transaction hash (leave empty for the latest)',
+                  'Хеш транзакции депозита (пусто — последняя оплата)',
+                ),
           )}
         </label>
         <div className="actions">
@@ -111,7 +127,7 @@ export function EscrowProof({
             pattern="0x[a-fA-F0-9]{64}"
           />
           <Button type="submit" busy={query.isFetching}>
-            {t(both('Verify escrow', 'Проверить escrow'))}
+            {t(compact ? both('Verify', 'Проверить') : both('Verify escrow', 'Проверить escrow'))}
           </Button>
         </div>
       </form>
@@ -132,11 +148,13 @@ export function EscrowProof({
       )}
       {data && !query.error && (
         <>
-          <p role="status">
-            {language === 'ru' && data.status === 'verified'
-              ? 'Узел подтвердил депозит и текущее состояние escrow. Начисления и вывод — отдельные действия.'
-              : data.message}
-          </p>
+          {(!compact || data.status !== 'verified') && (
+            <p role="status">
+              {language === 'ru' && data.status === 'verified'
+                ? 'Узел подтвердил депозит и текущее состояние escrow. Начисления и вывод — отдельные действия.'
+                : data.message}
+            </p>
+          )}
           {data.checks.length > 0 && (
             <p className="escrow-check-count">
               {t(both('Passed checks', 'Пройдено проверок'))}:{' '}
@@ -145,38 +163,41 @@ export function EscrowProof({
               </strong>
             </p>
           )}
-          <ul className="chain-proof-checks explained-proof-checks">
-            {data.checks.map((c, i) => {
-              const explanation = explainEscrowCheck(c.label);
-              return (
-                <li className={c.passed ? 'passed' : 'failed'} key={i}>
-                  <details>
-                    <summary>
-                      <span
-                        aria-label={t(
-                          c.passed ? both('Passed', 'Пройдено') : both('Failed', 'Не пройдено'),
-                        )}
-                      >
-                        {c.passed ? '✓' : '✕'}
-                      </span>{' '}
-                      {explanation ? t(explanation.title) : c.label}
-                    </summary>
-                    {explanation && <p>{t(explanation.detail)}</p>}
-                    <code>{c.label}</code>
-                    {onExplain && (
-                      <button
-                        type="button"
-                        className="text-button"
-                        onClick={() => onExplain('verify')}
-                      >
-                        {t(both('Open the verification code', 'Открыть код проверки'))}
-                      </button>
-                    )}
-                  </details>
-                </li>
-              );
-            })}
-          </ul>
+          <details className="compact-proof-evidence" open={!compact}>
+            <summary>{t(both('Technical checks', 'Технические проверки'))}</summary>
+            <ul className="chain-proof-checks explained-proof-checks">
+              {data.checks.map((c, i) => {
+                const explanation = explainEscrowCheck(c.label);
+                return (
+                  <li className={c.passed ? 'passed' : 'failed'} key={i}>
+                    <details>
+                      <summary>
+                        <span
+                          aria-label={t(
+                            c.passed ? both('Passed', 'Пройдено') : both('Failed', 'Не пройдено'),
+                          )}
+                        >
+                          {c.passed ? '✓' : '✕'}
+                        </span>{' '}
+                        {explanation ? t(explanation.title) : c.label}
+                      </summary>
+                      {explanation && <p>{t(explanation.detail)}</p>}
+                      <code>{c.label}</code>
+                      {onExplain && (
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() => onExplain('verify')}
+                        >
+                          {t(both('Open the verification code', 'Открыть код проверки'))}
+                        </button>
+                      )}
+                    </details>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
           {data.status === 'verified' &&
             data.orders.map((o) => (
               <article className="escrow-proof-order" key={o.id}>
@@ -316,10 +337,12 @@ export function EscrowProof({
       )}
       <p className="field-hint">
         {t(
-          both(
-            'Source: Anvil JSON-RPC. Deposit, release and withdrawal are different transactions.',
-            'Источник: Anvil JSON-RPC. Депозит, завершение и вывод — разные транзакции.',
-          ),
+          compact
+            ? both('Anvil RPC', 'Anvil RPC')
+            : both(
+                'Source: Anvil JSON-RPC. Deposit, release and withdrawal are different transactions.',
+                'Источник: Anvil JSON-RPC. Депозит, завершение и вывод — разные транзакции.',
+              ),
         )}
         {data && (
           <>

@@ -158,9 +158,10 @@ platform, **0.0081** to the creator and **0.0027** to the co-author. Gas is sepa
 
 ## Technical walkthrough with source code
 
-Open **`/#/blockchain-demo?view=code`**, without signing in. The 15-step guide
-shows startup commands, exact source excerpts with line numbers, external-wallet
-SIWE linking, custodial demo signing, a storage map and the escrow lifecycle.
+Open **`/#/blockchain-demo`**, without signing in. Six short steps cover startup,
+wallets, files, escrow, licenses and verification. Source code and storage paths
+expand on request; live payment verification loads only in the final step.
+The code covers SIWE linking, custodial demo signing and escrow settlement.
 Select **RU** for Russian explanations. Direct sections use `&step=wallet`,
 `&step=storage` or `&step=deposit`; `&lang=ru` preserves the explanation language.
 

@@ -55,146 +55,89 @@ const snapshot = {
     receipt: { status: '0x1', transactionHash: '0xproof', blockNumber: '0x6', logs: [] },
   },
 };
-function setup() {
+function setup(entry = '/blockchain-demo') {
   return render(
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })}
     >
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[entry]}>
         <BlockchainDemo />
       </MemoryRouter>
     </QueryClientProvider>,
   );
-}
-async function setupLegacy() {
-  const view = setup();
-  await userEvent.click(screen.getByText('Earlier direct-payment purchases'));
-  return view;
 }
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.allowed = true;
   mocks.verified = true;
   mocks.signedIn = true;
-  mocks.api.mockResolvedValue(snapshot);
+  mocks.api.mockImplementation((path: string) =>
+    Promise.resolve(
+      path.startsWith('/blockchain/demo-proof')
+        ? snapshot
+        : {
+            status: 'verified',
+            message: 'RPC verified.',
+            checks: [{ label: 'Deposit succeeded at a configured escrow contract', passed: true }],
+            orders: [],
+            checkedAt: '2026-11-10T10:00:00Z',
+          },
+    ),
+  );
 });
-it('keeps legacy proof behind an explicit archive for guests and regular accounts', async () => {
-  for (const [signedIn, allowed, verified] of [
-    [false, false, false],
-    [true, false, true],
-    [true, true, false],
-  ]) {
-    mocks.api.mockClear();
-    mocks.signedIn = signedIn;
-    mocks.allowed = allowed;
-    mocks.verified = verified;
-    const view = setup();
-    expect(mocks.api.mock.calls.some(([path]) => path === '/blockchain/demo-proof')).toBe(false);
-    await userEvent.click(screen.getByText('Earlier direct-payment purchases'));
-    expect(await screen.findByText('Verified directly on the local chain')).toBeVisible();
-    expect(screen.getByText('0xproof')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Open accounting' })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
-    expect(screen.getByRole('heading', { name: 'Prepare the purchase' })).toBeVisible();
-    expect(
-      mocks.api.mock.calls.every(([path]) =>
-        ['/blockchain/demo-proof', '/blockchain/escrow-proof'].includes(path),
-      ),
-    ).toBe(true);
-    view.unmount();
-  }
+it('starts with six concise steps for guests and no automatic proof or admin requests', async () => {
+  mocks.signedIn = false;
+  setup();
+  expect(
+    await screen.findByRole('heading', { name: 'Start the app and blockchain' }),
+  ).toBeVisible();
+  expect(
+    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getAllByRole('button'),
+  ).toHaveLength(6);
+  expect(screen.queryByText('Admin tools')).not.toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Live blockchain check' })).not.toBeInTheDocument();
+  expect(mocks.api).not.toHaveBeenCalled();
 });
-it('keeps the walkthrough and presentation controls while allowing public proof refresh', async () => {
-  await setupLegacy();
-  await screen.findByText('Verified directly on the local chain');
-  const flow = within(screen.getByRole('navigation', { name: 'Blockchain walkthrough steps' }));
-  await userEvent.click(flow.getByRole('button', { name: /Withdraw/ }));
-  expect(screen.getByRole('heading', { name: 'Withdraw the earnings' })).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: 'Start again' }));
-  expect(screen.getByRole('heading', { name: 'Register the work' })).toBeVisible();
+it('preserves Russian deep links and reads RPC only when the verification step opens', async () => {
+  mocks.signedIn = false;
+  setup('/blockchain-demo?view=code&step=deposit&lang=ru');
+  expect(await screen.findByRole('heading', { name: 'Оплати через escrow' })).toBeVisible();
+  expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument();
+  expect(mocks.api).not.toHaveBeenCalled();
+  await userEvent.click(
+    within(screen.getByRole('navigation', { name: 'Walkthrough steps' })).getByRole('button', {
+      name: /Проверка/,
+    }),
+  );
+  expect(await screen.findByText('1 / 1')).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Проверь оплату на узле' })).toBeVisible();
+  expect(screen.getByText('Оплата успешно дошла до escrow-контракта')).not.toBeVisible();
+  await userEvent.click(screen.getByText('Технические проверки'));
+  expect(screen.getByText('Оплата успешно дошла до escrow-контракта')).toBeVisible();
+  expect(
+    mocks.api.mock.calls.every(
+      ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
+    ),
+  ).toBe(true);
+});
+it('keeps the older payment archive optional inside verification', async () => {
+  setup('/blockchain-demo?step=verify');
+  await screen.findByText('1 / 1');
+  expect(mocks.api.mock.calls.some(([path]) => path === '/blockchain/demo-proof')).toBe(false);
+  await userEvent.click(screen.getByText('Earlier direct payments'));
+  expect(await screen.findByText('Verified directly on the local chain')).toBeVisible();
+  expect(screen.getByText('0xproof')).toBeVisible();
+  expect(mocks.api.mock.calls.every(([, options]) => !options?.method)).toBe(true);
+});
+it('retains presentation mode and hides admin tools until explicitly expanded', async () => {
+  setup();
+  await screen.findByRole('heading', { name: 'Start the app and blockchain' });
+  expect(screen.getByText('Admin tools')).toBeVisible();
+  expect(mocks.api).not.toHaveBeenCalled();
   await userEvent.click(screen.getByRole('button', { name: 'Presentation view' }));
   await userEvent.keyboard('{Escape}');
   expect(screen.getByRole('button', { name: 'Presentation view' })).toHaveAttribute(
     'aria-pressed',
     'false',
   );
-  expect(screen.getByText('0.0081 test ETH', { selector: 'strong' })).toBeVisible();
-  expect(screen.getByText('0.0027 test ETH')).toBeVisible();
-  expect(screen.getByText('0xcontract')).not.toBeVisible();
-  await userEvent.click(screen.getByText('RPC receipt, block & contract evidence'));
-  expect(screen.getByText('0xcontract')).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: 'Refresh proof' }));
-  expect(
-    mocks.api.mock.calls.every(
-      ([path, options]) =>
-        ['/blockchain/demo-proof', '/blockchain/escrow-proof'].includes(path) && !options?.method,
-    ),
-  ).toBe(true);
-});
-it('shows unavailable or failed refreshes without inventing a purchase or keeping a live verified label', async () => {
-  mocks.api.mockResolvedValue({
-    ...snapshot,
-    status: 'unavailable',
-    message: 'Node unavailable. Try again.',
-    transaction: null,
-    checks: [],
-  });
-  await setupLegacy();
-  expect(await screen.findByText('Node unavailable. Try again.')).toBeVisible();
-  expect(screen.queryByText('0.0081 test ETH')).not.toBeInTheDocument();
-  expect(screen.queryByText('Verified directly on the local chain')).not.toBeInTheDocument();
-  mocks.api.mockRejectedValue(new Error('Disconnected'));
-  await userEvent.click(screen.getByRole('button', { name: 'Refresh proof' }));
-  expect(await screen.findByRole('alert')).toHaveTextContent('Disconnected');
-});
-it('validates hashes before sending a request and distinguishes unwithdrawn credit from an external payment', async () => {
-  await setupLegacy();
-  await screen.findByText('Verified directly on the local chain');
-  const calls = mocks.api.mock.calls.length;
-  await userEvent.type(screen.getByRole('textbox', { name: 'Transaction hash' }), 'invalid');
-  await userEvent.click(screen.getByRole('button', { name: 'Verify transaction' }));
-  expect(await screen.findByRole('alert')).toHaveTextContent('Enter a transaction hash');
-  expect(mocks.api).toHaveBeenCalledTimes(calls);
-  await userEvent.click(screen.getByText('Wallet credits & confirmed withdrawals'));
-  expect(screen.getByText(/No withdrawal was recorded/)).toBeVisible();
-  const hash = '0x' + 'a'.repeat(64);
-  await userEvent.clear(screen.getByRole('textbox', { name: 'Transaction hash' }));
-  await userEvent.type(screen.getByRole('textbox', { name: 'Transaction hash' }), hash);
-  await userEvent.click(screen.getByRole('button', { name: 'Verify transaction' }));
-  expect(
-    mocks.api.mock.calls.some(
-      ([path]) => path === '/blockchain/demo-proof?transactionHash=' + hash,
-    ),
-  ).toBe(true);
-});
-it('explains escrow delivery and release before showing a wallet license or revenue', async () => {
-  setup();
-  expect(screen.getByRole('heading', { name: 'The current escrow license flow' })).toBeVisible();
-  const flow = within(screen.getByRole('navigation', { name: 'Blockchain walkthrough steps' }));
-  await userEvent.click(flow.getByRole('button', { name: /Deposit/ }));
-  expect(screen.getByText(/deposit holds the payment without issuing a license/)).toBeVisible();
-  await userEvent.click(flow.getByRole('button', { name: /Review/ }));
-  expect(screen.getByText(/7 days without a dispute decision/)).toBeVisible();
-  await userEvent.click(flow.getByRole('button', { name: /Release/ }));
-  expect(screen.getByText(/license period starts on release/)).toBeVisible();
-  expect(mocks.api.mock.calls.some(([path]) => path === '/blockchain/demo-proof')).toBe(false);
-});
-it('opens the wallet and storage code walkthrough from the guest page without authentication', async () => {
-  mocks.signedIn = false;
-  setup();
-  await userEvent.click(screen.getByRole('button', { name: 'Storage map', exact: true }));
-  expect(
-    await screen.findByRole('heading', { name: '6. Where each type of data is stored' }),
-  ).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: /How wallets connect/ }));
-  expect(screen.getByRole('heading', { name: /4\. Connect and prove/ })).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: 'RU', exact: true }));
-  expect(
-    screen.getByRole('heading', { name: '4. Подключить внешний кошелёк и подтвердить владение' }),
-  ).toBeVisible();
-  expect(
-    mocks.api.mock.calls.every(
-      ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
-    ),
-  ).toBe(true);
 });
