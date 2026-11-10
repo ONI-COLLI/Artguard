@@ -28,9 +28,8 @@ export const linearSteps = [
     ),
     command: '# Terminal 1\nnpm run chain',
     sources: [source('chain', 1)],
-    outputKind: both('Terminal example', 'Пример терминала'),
-    output:
-      'ArtGuard local chain ready: http://127.0.0.1:8545 (chain 31337)\nRegistry: <registry address>. State saved under data/chain. Test ETH only.\nEscrow marketplace: <escrow address>',
+    outputKind: both('Live deployment · RPC', 'Текущее развёртывание · RPC'),
+    output: '',
   },
   {
     id: 'client',

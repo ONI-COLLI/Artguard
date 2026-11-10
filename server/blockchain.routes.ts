@@ -24,6 +24,7 @@ import { LocalBlockchain } from './blockchain.js';
 import { HttpError } from './errors.js';
 import { publicDemo } from './hosting.js';
 import { sharedDemoAccount } from './public-demo.js';
+import { deploymentStatus } from './deployment-status.js';
 
 const hashSchema = z.string().regex(/^0x[\da-fA-F]{64}$/, 'Enter a valid transaction hash.');
 const walletSchema = z
@@ -57,6 +58,10 @@ export function blockchainRoutes(repo: Repository, chain: LocalBlockchain) {
     message: { error: 'Too many wallet requests. Try again shortly.' },
   });
   r.get('/blockchain/status', async (_req, res) => res.json(await chain.status()));
+  r.get('/blockchain/deployments', limit, async (_req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.json(await deploymentStatus(chain));
+  });
   // Only read/simulation RPC methods are exposed; unlocked node accounts cannot be used through this proxy.
   r.post(
     '/blockchain/rpc',

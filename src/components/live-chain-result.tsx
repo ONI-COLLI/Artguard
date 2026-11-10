@@ -5,6 +5,7 @@ import { both, translated, type CodeLanguage } from '../lib/demo-language';
 import type { EscrowProof } from '../../shared/escrow-proof';
 import { testEth } from '../../shared/marketplace';
 import { explainEscrowCheck } from '../lib/escrow-proof-explainer';
+import { ShortHex } from './short-hex';
 
 export function LiveChainResult({ language }: { language: CodeLanguage }) {
   const [input, setInput] = useState(''),
@@ -108,14 +109,18 @@ export function LiveChainResult({ language }: { language: CodeLanguage }) {
                   <div>
                     <dt>{t('Deposit', 'Депозит')}</dt>
                     <dd>
-                      <code>{order.depositHash}</code>
+                      <code>
+                        <ShortHex value={order.depositHash} />
+                      </code>
                     </dd>
                   </div>
                   {order.releaseHash && (
                     <div>
                       <dt>{t('Release', 'Завершение')}</dt>
                       <dd>
-                        <code>{order.releaseHash}</code>
+                        <code>
+                          <ShortHex value={order.releaseHash} />
+                        </code>
                       </dd>
                     </div>
                   )}
@@ -123,14 +128,19 @@ export function LiveChainResult({ language }: { language: CodeLanguage }) {
                     <div>
                       <dt>{t('Refund credit', 'Начисление возврата')}</dt>
                       <dd>
-                        <code>{order.refundHash}</code>
+                        <code>
+                          <ShortHex value={order.refundHash} />
+                        </code>
                       </dd>
                     </div>
                   )}
                   <div>
                     <dt>{t('Buyer / license', 'Покупатель / лицензия')}</dt>
                     <dd>
-                      <code>{order.buyer}</code> ·{' '}
+                      <code>
+                        <ShortHex value={order.buyer} />
+                      </code>{' '}
+                      ·{' '}
                       {order.licenseActive
                         ? t('active', 'действует')
                         : t('inactive', 'не действует')}
@@ -149,7 +159,10 @@ export function LiveChainResult({ language }: { language: CodeLanguage }) {
                     <ul>
                       {order.allocations.map((item, index) => (
                         <li key={index}>
-                          <code>{item.wallet}</code> → {testEth(item.amountWei)}
+                          <code>
+                            <ShortHex value={item.wallet} />
+                          </code>{' '}
+                          → {testEth(item.amountWei)}
                         </li>
                       ))}
                     </ul>
@@ -160,9 +173,14 @@ export function LiveChainResult({ language }: { language: CodeLanguage }) {
                   <ul>
                     {order.withdrawals.map((item, index) => (
                       <li key={index}>
-                        <code>{item.wallet}</code> → {testEth(item.amountWei)}
+                        <code>
+                          <ShortHex value={item.wallet} />
+                        </code>{' '}
+                        → {testEth(item.amountWei)}
                         <br />
-                        <code>{item.hash}</code>
+                        <code>
+                          <ShortHex value={item.hash} />
+                        </code>
                       </li>
                     ))}
                   </ul>

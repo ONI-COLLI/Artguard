@@ -165,6 +165,19 @@
 .walkthrough-output-panel {
   background: #171717;
 }
+.walkthrough-output-note {
+  color: #858585;
+  font:
+    10px/1.6 'Cascadia Code',
+    Consolas,
+    monospace;
+  margin: 8px 0;
+}
+.short-hex {
+  color: #c9bc9f;
+  cursor: help;
+  white-space: nowrap;
+}
 .walkthrough-panel-heading {
   flex-shrink: 0;
   display: flex;

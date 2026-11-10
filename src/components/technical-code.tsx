@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { linearSteps, linearStorage, studioBlocks } from '../lib/linear-walkthrough';
 import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
 import { LiveChainResult } from './live-chain-result';
+import { ChainStartupOutput } from './chain-startup-output';
 import './technical-code.css';
 
 const keywords = new Set(
@@ -221,7 +222,9 @@ export default function TechnicalCodeWalkthrough({
         >
           <div className="walkthrough-panel-heading">
             <span>{t(both('Terminal output', 'Вывод терминала'))}</span>
-            <small>{index === 3 ? 'EXAMPLE + LIVE RPC' : t(both('Example', 'Пример'))}</small>
+            <small>
+              {index === 0 || index === 3 ? 'EXAMPLE + LIVE RPC' : t(both('Example', 'Пример'))}
+            </small>
           </div>
           <div className="walkthrough-output-scroll" ref={terminal}>
             {steps.map((step) => (
@@ -235,9 +238,13 @@ export default function TechnicalCodeWalkthrough({
                     <code>{step.command}</code>
                   </pre>
                 )}
-                <pre className="walkthrough-output">
-                  <code>{step.output}</code>
-                </pre>
+                {step.id === 'chain' ? (
+                  <ChainStartupOutput language={language} />
+                ) : (
+                  <pre className="walkthrough-output">
+                    <code>{step.output}</code>
+                  </pre>
+                )}
               </section>
             ))}
             {index === 1 && (

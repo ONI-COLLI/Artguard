@@ -74,7 +74,7 @@ it('uses four blocks with source filenames and line numbers, without an IDE shel
     view.container.querySelector('.studio-fullscreen, .studio-activity, .studio-statusbar'),
   ).toBeNull();
   expect(screen.queryByRole('link', { name: 'Back to ArtGuard' })).not.toBeInTheDocument();
-  expect(mocks.api).not.toHaveBeenCalled();
+  expect(mocks.api).toHaveBeenCalledWith('/blockchain/deployments');
 });
 it('navigates blocks by keyboard and shows filenames, directories and storage', async () => {
   setup();
@@ -85,11 +85,12 @@ it('navigates blocks by keyboard and shows filenames, directories and storage', 
   expect(screen.getByRole('link', { name: 'ArtworkRegistry.sol' })).toBeVisible();
   expect(screen.getByText('contracts/')).toBeVisible();
   expect(document.querySelectorAll('.walkthrough-code-file pre').length).toBeGreaterThan(1);
-  expect(mocks.api).not.toHaveBeenCalled();
+  expect(mocks.api.mock.calls.every(([path]) => path === '/blockchain/deployments')).toBe(true);
 });
-it('labels examples and reads the real node only in the payout and verification block', async () => {
+it('labels examples separately from deployment and payment data read from the real node', async () => {
   setup();
-  expect(screen.getAllByText('Terminal example')).toHaveLength(2);
+  expect(screen.getAllByText('Terminal example')).toHaveLength(1);
+  expect(screen.getByText('Live deployment · RPC')).toBeVisible();
   await userEvent.click(screen.getByRole('tab', { name: /Payouts & proof/ }));
   expect(await screen.findByText('No local deposit.')).toBeVisible();
   expect(screen.getByText('LIVE · ANVIL JSON-RPC')).toBeVisible();
@@ -98,7 +99,8 @@ it('labels examples and reads the real node only in the payout and verification 
   expect(screen.getByRole('heading', { name: 'Вывод → проверка на узле' })).toBeVisible();
   expect(
     mocks.api.mock.calls.every(
-      ([path, options]) => path === '/blockchain/escrow-proof' && !options?.method,
+      ([path, options]) =>
+        ['/blockchain/deployments', '/blockchain/escrow-proof'].includes(path) && !options?.method,
     ),
   ).toBe(true);
 });

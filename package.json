@@ -35,7 +35,7 @@
     "test": "npm run test:unit && npm run test:api && npm run test:blockchain && npm run test:deployment && npm run test:finance-model",
     "test:unit": "vitest run",
     "test:deployment": "npm run build && tsx --test tests/deployment.test.ts",
-    "test:api": "tsx --test --test-concurrency=1 tests/server.test.ts tests/platform.test.ts tests/accounting.test.ts tests/exchange.test.ts tests/gallery.test.ts tests/home.test.ts tests/blockchain-demo.test.ts tests/public-chain-proof.test.ts tests/staff-oauth.test.ts tests/public-hosting.test.ts tests/prototype-review.test.ts tests/presentation-evidence.test.ts tests/defense-guard.test.ts tests/dev-proxy.test.ts",
+    "test:api": "tsx --test --test-concurrency=1 tests/server.test.ts tests/platform.test.ts tests/accounting.test.ts tests/exchange.test.ts tests/gallery.test.ts tests/home.test.ts tests/blockchain-demo.test.ts tests/public-chain-proof.test.ts tests/deployment-status.test.ts tests/staff-oauth.test.ts tests/public-hosting.test.ts tests/prototype-review.test.ts tests/presentation-evidence.test.ts tests/defense-guard.test.ts tests/dev-proxy.test.ts",
     "format": "prettier --write src server shared tests scripts *.json *.ts index.html README.md",
     "format:check": "prettier --check src server shared tests scripts *.json *.ts index.html README.md",
     "chain:licenses": "node --env-file-if-exists=.env --import tsx scripts/upgrade-licenses.ts",
