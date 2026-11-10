@@ -364,8 +364,8 @@ export const technicalSteps: TechnicalStep[] = [
       excerpt(
         'server/artwork.routes.ts',
         uploadSource,
-        'const file = files?.file?.[0]',
-        13,
+        "hash = createHash('sha256').update(file.buffer).digest('hex')",
+        11,
         "createHash('sha256')",
       ),
     ],
