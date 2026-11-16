@@ -149,7 +149,7 @@ test('email verification uses private, hashed, expiring single-use tokens and ga
   assert.equal(JSON.stringify((await actor.request('/api/state')).data).includes(token), false);
 });
 
-test('verification expiry, resend cooldown and changing email invalidate previous links', async (t) => {
+test('verification expiry and resend work while profile cannot silently change sign-in email', async (t) => {
   const { app, register, tokenFor } = await setup(t),
     { actor, email, id } = await register('Emailchange', false),
     first = tokenFor(email, 'verify');
@@ -171,15 +171,19 @@ test('verification expiry, resend cooldown and changing email invalidate previou
         'PATCH',
       )
     ).status,
-    200,
+    403,
   );
-  assert.equal((await actor.request('/api/auth/verify-email', { token: second })).status, 400);
-  assert.equal(
-    (await actor.request('/api/auth/verify-email', { token: tokenFor(nextEmail, 'verify') }))
-      .status,
-    200,
-  );
+  assert.equal((await actor.request('/api/state')).data.user.email, email);
+  assert.equal((await actor.request('/api/auth/verify-email', { token: second })).status, 200);
   assert.equal((await actor.request('/api/state')).data.user.emailVerified, true);
+});
+
+test('wallet unlink requires a fresh account password', async (t) => {
+  const { register } = await setup(t);
+  const { actor } = await register('Walletsecurity');
+  assert.equal((await actor.request('/api/wallet', undefined, 'DELETE')).status, 400);
+  assert.equal((await actor.request('/api/wallet', { password: 'wrong-password' }, 'DELETE')).status, 403);
+  assert.equal((await actor.request('/api/wallet', { password: 'platform-test-password' }, 'DELETE')).status, 200);
 });
 
 test('password reset is purpose-bound, single-use and revokes every existing session', async (t) => {
@@ -283,8 +287,11 @@ test('paid access cannot be granted through profile fields or legacy plans and e
     },
     'PATCH',
   );
-  assert.equal(profile.data.user.isAdmin, false);
-  assert.equal(profile.data.user.plan, 'free');
+  assert.equal(profile.status, 403);
+  const savedProfile = await actor.request('/api/profile', { name: 'Expiry updated', isAdmin: true, plan: 'business' }, 'PATCH');
+  assert.equal(savedProfile.data.user.name, 'Expiry updated');
+  assert.equal(savedProfile.data.user.isAdmin, false);
+  assert.equal(savedProfile.data.user.plan, 'free');
   assert.equal((await actor.request('/api/admin/moderation')).status, 403);
   planFixture(app.db, id, 'premium');
   for (let n = 0; n < 6; n++) assert.equal((await upload(actor, 'expiry-' + n)).status, 201);

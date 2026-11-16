@@ -10,13 +10,14 @@ import {
   type Connector,
 } from 'wagmi';
 import { useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
 import { CheckCircle2, Circle, RefreshCw } from 'lucide-react';
 import { localChain } from '../../shared/blockchain';
 import { api } from '../lib/api';
 import { useData, useAction, useFeedback } from '../lib/workspace';
 import { useChainStatus, walletError } from '../lib/blockchain';
 import { useDialog } from './dialogs';
-import { Button } from './ui';
+import { Button, Form, Field, Submit } from './ui';
 import { ChainAmount, CurrencyNote, RateInfo } from './currency';
 const MarketProceeds = lazy(() =>
   import('./market-proceeds').then((m) => ({ default: m.MarketProceeds })),
@@ -309,15 +310,18 @@ export function WalletPanel({
             className="text-button"
             busy={unlink.isPending}
             disabled={busy}
-            onClick={() =>
-              void run(async () => {
-                await unlink.mutateAsync({});
-                notify({
-                  title: 'Wallet unlinked',
-                  detail: 'Existing blockchain records keep their original wallet address.',
-                });
-              })
-            }
+            onClick={() => open('Unlink wallet',
+              <Form schema={z.object({ password: z.string().min(1, 'Enter your account password.') })}
+                defaults={{ password: '' }}
+                onSubmit={async ({ password }) => {
+                  await unlink.mutateAsync({ password });
+                  notify({ title: 'Wallet unlinked', detail: 'Existing blockchain records keep their original wallet address.' });
+                  open('Wallet unlinked', <p>Your account is no longer linked to that wallet.</p>);
+                }}>
+                <p className="muted small-text">Existing blockchain credits and licenses stay with the old wallet. Withdraw any earnings before unlinking.</p>
+                <Field name="password" label="Account password" type="password" />
+                <Submit>Confirm unlink</Submit>
+              </Form>)}
           >
             Unlink wallet from account
           </Button>

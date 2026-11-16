@@ -23,6 +23,9 @@ export interface User {
   wallet: LinkedWallet | null;
 }
 export interface Artwork {
+  dimensions?: { width: number; height: number };
+  coverDimensions?: { width: number; height: number };
+  favorite?: boolean;
   usagePolicyVersion?: string;
   licenseDurationDays?: number;
   gallery?: { id: string; url: string }[];

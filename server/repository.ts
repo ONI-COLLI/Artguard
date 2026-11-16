@@ -182,7 +182,13 @@ export class Repository {
     );
   }
   serialize(a: ArtworkRow, user: UserRow | null): Artwork {
+    const cover = this.one<{width: number; height: number; file_width: number; file_height: number}>(
+      'SELECT width,height,file_width,file_height FROM artwork_covers WHERE artwork_id=?', a.id,
+    );
     return {
+      ...(cover?.file_width && cover.file_height ? { dimensions: {width: cover.file_width, height: cover.file_height} } : {}),
+      ...(cover?.width && cover.height ? { coverDimensions: {width: cover.width, height: cover.height} } : {}),
+      favorite: !!user && !!this.one('SELECT 1 FROM artwork_favorites WHERE user_id=? AND artwork_id=?', user.id, a.id),
       usagePolicyVersion: this.one<{ version: string }>(
         'SELECT version FROM artwork_usage_policies WHERE artwork_id=?',
         a.id,

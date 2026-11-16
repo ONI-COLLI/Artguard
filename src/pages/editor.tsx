@@ -16,6 +16,8 @@ import { ShareStatusCard } from './coauthors';
 import { GalleryEditor } from '../components/gallery-editor';
 import { maxGalleryImages, maxGalleryImageBytes, galleryMimeTypes } from '../../shared/gallery';
 import { detailedUsage, licensePeriodRule } from '../../shared/license-terms';
+import { ProductFileInput } from '../components/product-file';
+import { maxProductFileBytes, fileSize } from '../../shared/files';
 function Licenses() {
   const {
     register,
@@ -80,17 +82,18 @@ function ImageInput() {
           <strong>{file ? file.name : 'Drop your artwork here'}</strong>
           <span>
             {file
-              ? `${(file.size / 1024 / 1024).toFixed(2)} MB · Click to change`
+              ? `${fileSize(file.size)} · Click to change`
               : 'or choose a file from your computer'}
           </span>
         </div>
         <input
           aria-label="Artwork file"
+          className="file-input"
           type="file"
           accept="image/png,image/jpeg,image/webp"
           {...register('file')}
         />
-        <small>PNG, JPG, WEBP · up to 20 MB</small>
+        <small>Cover image · PNG, JPG, WEBP · up to 20 MB</small>
       </label>
       {errors.file && (
         <p className="field-error" role="alert">
@@ -207,6 +210,9 @@ export default function Editor() {
         })
   )
     .extend({
+      productFile: z.custom<FileList>().optional()
+        .refine(v => !v?.[0] || (v[0].size > 0 && v[0].size <= maxProductFileBytes), 'Choose a nonempty product file up to 20 MB.')
+        .refine(v => !v?.[0] || /\.(png|jpe?g|webp|pdf|zip)$/i.test(v[0].name), 'Use PNG, JPG, WEBP, PDF, or ZIP.'),
       retainedGallery: z.array(z.string()).max(maxGalleryImages).default([]),
       galleryFiles: z
         .array(z.custom<File>())
@@ -243,6 +249,18 @@ export default function Editor() {
         title={a ? 'Refine your artwork.' : 'Publish your artwork.'}
         description="Add the details. Set your terms. Make it yours."
       />
+      {d.privacy && !d.privacy.accepted && (
+        <div className="local-note" role="status">
+          To publish, <Link to="/privacy">review and accept the current terms</Link>. You can still save a draft.
+        </div>
+      )}
+      {a?.status === 'draft' && (
+        <div className="local-note" role="status">
+          {a.shareApproval?.ready === false
+            ? 'Waiting for co-authors to approve their shares. After they approve, select “Publish to marketplace” below and save again.'
+            : 'This project is a draft. Select “Publish to marketplace” below and save to make it visible in the catalog.'}
+        </div>
+      )}
       {full && (
         <div className="local-note">
           Your upload limit is reached. <Link to="/pricing">Choose another plan</Link> to add more
@@ -279,7 +297,7 @@ export default function Editor() {
           }
           onSubmit={async (v, form) => {
             setProgress(null);
-            const { galleryFiles, ...details } = v;
+            const { galleryFiles, productFile, ...details } = v;
             let data: FormData | Record<string, unknown> = details;
             if (!a || galleryFiles.length) {
               const f = new FormData();
@@ -298,6 +316,7 @@ export default function Editor() {
               for (const file of galleryFiles) f.append('gallery', file);
               if (!a) {
                 f.append('file', (v.file as FileList)[0]);
+                if ((productFile as FileList | undefined)?.[0]) f.append('productFile', (productFile as FileList)[0]);
                 f.append('rights', 'true');
               }
               data = f;
@@ -327,6 +346,8 @@ export default function Editor() {
           }}
         >
           {!a && <ImageInput />}
+          {!a && <ProductFileInput />}
+          {a && <p className="field-hint">The original product file is preserved for existing licenses and blockchain records. Publish a new project for a different original file.</p>}
           <GalleryEditor artwork={a} />
           <div className="section-label">
             01 <span>Artwork details</span>
@@ -401,7 +422,7 @@ export default function Editor() {
             <Link to="/works">Cancel</Link>
             {!full && (
               <Submit>
-                Save artwork <ArrowRight size={16} />
+                Save project <ArrowRight size={16} />
               </Submit>
             )}
           </div>

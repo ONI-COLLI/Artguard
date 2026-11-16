@@ -108,6 +108,12 @@ export function ProfileNavigation() {
       : []),
     ['/profile/wallet', 'Wallet', Wallet],
   ];
+  const groups = [
+    { label: 'Your work', links: sections.filter(([to]) => ['/profile', '/works', '/licenses', '/escrow', '/analytics', '/coauthors'].includes(to)) },
+    { label: 'Account', links: sections.filter(([to]) => ['/billing', '/security', '/privacy', '/reports'].includes(to)) },
+    { label: 'Site tools', links: sections.filter(([to]) => to.startsWith('/admin/') || to.startsWith('/manager/')) },
+    { label: 'Your wallet', links: sections.filter(([to]) => to === '/profile/wallet') },
+  ].filter((group) => group.links.length);
   return (
     <aside className="profile-sidebar" aria-label="Profile navigation">
       <span className="profile-sidebar-title">Your workspace</span>
@@ -126,17 +132,17 @@ export function ProfileNavigation() {
         className={`profile-sections${menuOpen ? ' is-open' : ''}`}
         aria-label="Profile sections"
       >
-        {sections.map(([to, label, Icon]) => (
-          <NavLink
-            end
-            to={to}
-            key={to}
-            className={to === '/profile/wallet' ? 'profile-wallet-link' : undefined}
-            onClick={() => setMenuOpen(false)}
-          >
-            <Icon size={17} aria-hidden="true" />
-            {label}
-          </NavLink>
+        {groups.map((group) => (
+          <div className="profile-nav-group" key={group.label}>
+            <span className="profile-nav-group-label">{group.label}</span>
+            {group.links.map(([to, label, Icon]) => (
+              <NavLink end to={to} key={to}
+                className={to === '/profile/wallet' ? 'profile-wallet-link' : undefined}
+                onClick={() => setMenuOpen(false)}>
+                <Icon size={17} aria-hidden="true" />{label}
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
     </aside>

@@ -20,6 +20,8 @@ import { detailedUsage, licensePeriodRule } from '../../shared/license-terms';
 import type { Artwork, LicenseId } from '../../shared/types';
 import { licensePeriodLabel } from '../../shared/marketplace';
 import { ShareStatusCard } from './coauthors';
+import { WhatYouGet } from '../components/product-file';
+import { FavoriteButton } from '../components/favorite-button';
 import { ReportForm } from './moderation';
 export default function Marketplace() {
   const { currency, rates, money, available, fromUsd, toUsd } = useDisplayCurrency();
@@ -406,6 +408,15 @@ export function ArtworkDetail() {
               <p className="form-error">Hidden by a moderator: {a.moderation.reason}</p>
             )}
             {a.shareApproval && !a.shareApproval.ready && <ShareStatusCard artwork={a} />}
+            {a.own && a.status === 'draft' && (
+              <div className="local-note" role="status">
+                <strong>Why this is a draft</strong>
+                <p>{a.shareApproval?.ready === false
+                  ? 'Every co-author must approve their share. After approval, edit this project and choose “Publish to marketplace”.'
+                  : 'Open the editor, choose “Publish to marketplace”, and save the project.'}</p>
+                <Link to={'/edit/' + a.id}>Open project editor →</Link>
+              </div>
+            )}
             <span className={'status ' + (a.status === 'draft' ? 'draft' : '')}>
               <i />
               {a.status === 'draft' ? 'Draft' : 'Available for licensing'}
@@ -415,7 +426,7 @@ export function ArtworkDetail() {
               <span className="avatar">{a.author[0]}</span>
               <div>
                 <small>Created by</small>
-                <strong>{a.author}</strong>
+                <Link className="creator-link" to={'/creator/'+a.ownerId}>{a.author}</Link>
               </div>
             </div>
             <div className="project-license-form">
@@ -429,9 +440,7 @@ export function ArtworkDetail() {
                   label: licenseTypes[k].title + ' license',
                 }))}
               />
-              <p className="muted small-text license-summary">
-                {a.usagePolicyVersion ? detailedUsage[license] : licenseTypes[license].description}
-              </p>
+              <WhatYouGet artwork={a} license={license} />
               <div className="detail-price" aria-live="polite">
                 <strong>{money(a.price * licenseTypes[license].factor)}</strong>
                 <span>{licensePeriodLabel(a.licenseDurationDays || 0)}</span>
@@ -490,6 +499,7 @@ export function ArtworkDetail() {
               </button>
             </div>
           )}
+          {a.own && <ChainRegistrationCard key={`${a.id}:${d.user?.id || 'guest'}`} artwork={a} />}
           <details className="project-more-info" key={a.id}>
             <summary>
               Additional information <ChevronDown size={17} aria-hidden="true" />
@@ -523,7 +533,6 @@ export function ArtworkDetail() {
                   View registration <ArrowUpRight size={13} />
                 </Link>
               </section>
-              <ChainRegistrationCard key={`${a.id}:${d.user?.id || 'guest'}`} artwork={a} />
               {a.shareApproval?.ready && <ShareStatusCard artwork={a} />}
               <p className="small-text muted">
                 A license grants usage rights. Copyright stays with the creator.

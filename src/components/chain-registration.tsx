@@ -33,7 +33,7 @@ function loadTransaction(key: string): SavedTransaction | null {
   }
 }
 export function ChainRegistrationCard({ artwork }: { artwork: Artwork }) {
-  const { user } = useData(),
+  const { user, privacy } = useData(),
     chain = useChainStatus(),
     connection = useConnection(),
     write = useWriteContract(),
@@ -213,7 +213,11 @@ export function ChainRegistrationCard({ artwork }: { artwork: Artwork }) {
       )}
       {canRegister &&
         !active &&
-        (!user?.wallet ||
+        (privacy && !privacy.accepted ? (
+          <p className="local-note" role="status">
+            Before registering this project, <a href="#/privacy">review and accept the current terms</a>.
+          </p>
+        ) : !user?.wallet ||
         !connection.isConnected ||
         connection.address?.toLowerCase() !== user.wallet.address.toLowerCase() ||
         connection.chainId !== 31337 ? (

@@ -95,14 +95,11 @@ export function accountRoutes(repo: Repository) {
         403,
         'Shared demo identities are fixed. Register your own demo account to edit its profile.',
       );
-    if (repo.one('SELECT id FROM users WHERE email=? AND id<>?', v.email, u.id))
-      throw new HttpError(409, 'This email is already in use.');
-    repo.run('UPDATE users SET name=?,email=?,role=? WHERE id=?', v.name, v.email, v.role, u.id);
-    if (v.email.toLowerCase() !== u.email.toLowerCase()) {
-      repo.run('DELETE FROM email_verifications WHERE user_id=?', u.id);
-      repo.run('DELETE FROM account_tokens WHERE user_id=?', u.id);
-      issueAccountToken(repo, repo.user(u.id), 'verify');
-    }
+    if (req.body.email !== undefined && req.body.email !== u.email)
+      throw new HttpError(403, 'Account email cannot be changed in profile settings.');
+    if (req.body.role !== undefined && req.body.role !== u.role)
+      throw new HttpError(403, 'Account role cannot be changed in profile settings.');
+    repo.run('UPDATE users SET name=? WHERE id=?', v.name, u.id);
     res.json(repo.snapshot(repo.user(u.id)));
   });
   r.patch('/plan', (req, res) => {

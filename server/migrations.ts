@@ -250,6 +250,25 @@ const migrations = [
     CREATE TABLE IF NOT EXISTS artwork_usage_policies (artwork_id TEXT PRIMARY KEY REFERENCES artworks(id) ON DELETE CASCADE,version TEXT NOT NULL);
   `,
   },
+  {
+    version: 13,
+    sql: `
+      CREATE TABLE artwork_covers (
+        artwork_id TEXT PRIMARY KEY REFERENCES artworks(id) ON DELETE CASCADE,
+        file_name TEXT NOT NULL,mime TEXT NOT NULL,width INTEGER,height INTEGER,
+        file_width INTEGER,file_height INTEGER
+      );
+      CREATE TABLE artwork_favorites (
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        artwork_id TEXT NOT NULL REFERENCES artworks(id) ON DELETE CASCADE,
+        created_at TEXT NOT NULL,PRIMARY KEY(user_id,artwork_id)
+      );
+      CREATE TABLE creator_bios (
+        user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        bio TEXT NOT NULL DEFAULT ''
+      );
+    `,
+  },
 ];
 export function migrate(db: DatabaseSync) {
   db.exec('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');

@@ -19,6 +19,7 @@ import { sessionUser } from './auth.js';
 import { HttpError, errorHandler } from './errors.js';
 import { accountRoutes } from './account.routes.js';
 import { artworkRoutes } from './artwork.routes.js';
+import { communityRoutes } from './community.routes.js';
 import { purchaseRoutes } from './purchase.routes.js';
 import { LocalBlockchain } from './blockchain.js';
 import { blockchainRoutes } from './blockchain.routes.js';
@@ -103,6 +104,7 @@ export async function createApp({
       return next(new HttpError(503, 'New project uploads are temporarily paused.'));
     next();
   });
+  app.use('/api', communityRoutes(repo));
   app.get('/api/health', (_req, res) =>
     res.json({ ok: true, storage: 'sqlite', blockchain: 'local-evm' }),
   );

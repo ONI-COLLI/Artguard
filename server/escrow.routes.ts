@@ -13,6 +13,7 @@ import { requireUser } from './auth.js';
 import { requireVerified } from './security.js';
 import { HttpError } from './errors.js';
 import { protectedPreview } from './previews.js';
+import { coverBytes } from './product-files.js';
 import { escrowRow, syncEscrow, serializeEscrow, type EscrowRow } from './escrow-records.js';
 async function checkedFile(repo: Repository, uploads: string, row: EscrowRow) {
   const artwork = repo.artwork(row.artwork_id);
@@ -92,7 +93,7 @@ export function escrowRoutes(repo: Repository, chain: LocalBlockchain, uploads: 
       .type('image/webp')
       .attachment('escrow-review-' + row.quote_id.slice(2, 12) + '.' + 'webp')
       .set('X-ArtGuard-Preview', 'watermarked; original available after release')
-      .send(await protectedPreview(bytes));
+      .send(await protectedPreview(artwork.mime.startsWith('image/') ? bytes : await coverBytes(repo, uploads, artwork)));
   });
   r.post('/escrow/:id/resolve', limit, async (req, res) => {
     const { user, row: before } = authorized(req, String(req.params.id));

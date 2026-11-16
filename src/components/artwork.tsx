@@ -5,10 +5,12 @@ import type { Artwork } from '../../shared/types';
 import { date, Empty } from './ui';
 import { useDisplayCurrency } from './currency';
 import { PromoteButton } from './promotions';
+import { FavoriteButton } from './favorite-button';
 export function ArtworkCard({ artwork: a }: { artwork: Artwork }) {
   const { money } = useDisplayCurrency();
   return (
     <article className="art-card">
+      <FavoriteButton artwork={a} compact />
       <Link className="art-cover" to={'/artwork/' + a.id} aria-label={'View artwork: ' + a.title}>
         <img src={sessionUrl(a.image)} alt={a.title} loading="lazy" />
         <span className="cover-arrow">
@@ -24,7 +26,7 @@ export function ArtworkCard({ artwork: a }: { artwork: Artwork }) {
       </Link>
       {a.blockchain && <span className="chain-tag">Blockchain record</span>}
       <div className="art-card-bottom">
-        <span>{a.author}</span>
+        {a.ownerId?<Link className="creator-link" to={'/creator/'+a.ownerId}>{a.author}</Link>:<span>{a.author}</span>}
         <strong>from {money(a.price)}</strong>
       </div>
     </article>

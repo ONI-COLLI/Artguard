@@ -12,6 +12,9 @@ local test ETH.
 
 **Repository:** <https://github.com/ONI-COLLI/Artguard>
 
+**Running it for the first time?** See [Local setup](#local-setup) for everything
+from installing Node.js to opening the demo accounts.
+
 ## Course deliverables
 
 | Item                                     | Link or status                                                                                                                                                                                                                       |
@@ -37,69 +40,104 @@ option is unavailable, use **People you choose** with the instructor address in
 the assignment. Add the same real sharing URL here, on the report title and on
 the presentation title. Keep the file and link available until final grades.
 
-## Requirements
+## Local setup
 
-- Node.js **22.13 or newer**; the local review used Node 22.22.2.
-- npm and Git. Install dependencies with `npm ci` using the committed lockfile.
-- Anvil is installed through the platform-specific optional npm dependency. Keep
-  optional dependencies enabled; no global Foundry installation is required.
-- A browser. Prepared test wallets work without MetaMask. Never connect a wallet
-  containing real assets.
+### 1. Install the tools and download the project
 
-No OAuth client credentials, paid services, public testnet or real assets are
-needed for the core demonstration. `.env.example` documents optional OAuth
-configuration; copy it to `.env` only if required and keep secrets out of Git.
+Install [Node.js 22 LTS](https://nodejs.org/en/download) and
+[Git](https://git-scm.com/downloads/). Use **Node.js 22.22.2 or a newer 22.x
+release** to match the locked dependencies and GitHub Actions. npm comes with
+Node.js. VS Code is optional.
 
-## Quick start for the actual local demonstration
+Open a new terminal after installation. On Windows, run these commands in
+PowerShell or in **Terminal → New Terminal** in VS Code:
 
 ```powershell
+node --version
+npm --version
+git --version
 git clone https://github.com/ONI-COLLI/Artguard.git
 cd Artguard
-npm ci
+npm ci --include=optional --include=dev
+```
+
+If you already have a Git checkout, open its folder and run `git pull --ff-only`
+before installing. You can also use **Code → Download ZIP** on GitHub, extract it,
+and open the folder containing `package.json`. In that case, start with `npm ci`.
+
+`npm ci` installs the versions from `package-lock.json`, including the
+platform-specific Anvil binary. There is no separate installation for React,
+Express, SQLite or Foundry on a supported platform. The standard local demo
+runs with the built-in test wallets, without MetaMask or an `.env` file.
+
+### 2. Start the blockchain and site
+
+Open two terminals in the **same project folder**. In the first, start Anvil
+and deploy the contracts. Leave this terminal open:
+
+```powershell
+npm run chain
+```
+
+Wait for the deployment messages through **Promotion payments**. The default
+RPC address is `http://127.0.0.1:8545` and the chain ID is **31337**.
+
+In the second terminal, prepare the fictional accounts and wallets, then build
+and start the application:
+
+```powershell
+npm run demo:setup
+npm run build
+npm start
+```
+
+When the API prints its URL, open [ArtGuard](http://localhost:3000/#/home).
+Use the **Guest workspace** menu in the header to switch test profiles in the
+same tab, or open [Demo studio](http://localhost:3000/#/demo) to give each role
+its own tab. Creator, Buyer and Co-author cover an escrow purchase. Manager
+handles reporting and disputes, and Administrator manages site settings.
+Use the [blockchain walkthrough](http://localhost:3000/#/blockchain-demo)
+to inspect deployments and verify an escrow payment.
+
+Stop the site and Anvil with **Ctrl+C** in their respective terminals. On later
+runs, start the chain and site again. Run the setup command on a new data
+directory and rebuild the client after changes to the source.
+
+### 3. Development and troubleshooting
+
+For live editing, keep Anvil running and use `npm run dev` in the second
+terminal instead of `npm start`. Open [Vite](http://localhost:5173). It proxies
+requests to the API on port **3000**.
+
+| Symptom | What to do |
+| --- | --- |
+| `node`, `npm` or `git` is not recognized | Check installation and open a new terminal. Run the three version checks above. |
+| PowerShell blocks `npm.ps1` | Use `npm.cmd` in the same commands, for example `npm.cmd ci --include=optional --include=dev`, or use Command Prompt. |
+| `Cannot find module` or Anvil binary missing | In the folder with `package.json`, run `npm ci --include=optional --include=dev` again and read the first install error. The lockfile supplies Anvil for Windows x64 and Linux/macOS x64 or ARM64. |
+| `.env not found. Continuing without it.` | Expected for the default local demo. Optional OAuth configuration is listed in `.env.example`. |
+| Port 8545 is in use | If the project's Anvil is already running, use that instance. Otherwise stop the specific service that owns the port before starting the chain. |
+| Port 3000 is in use | Check whether ArtGuard is already at `http://localhost:3000/api/health`. Reuse its server or stop the old ArtGuard process before starting another one. |
+| The API is up but the interface is missing | Run `npm run build` in the project folder, then reload the page at port 3000. |
+| Demo profiles show `Unavailable` | Check that Anvil finished deploying all contracts and run `npm run demo:setup` in the second terminal. |
+
+Local accounts, uploads and chain state live under `data/`. Keep that directory
+when restarting the demo or updating the checkout.
+
+## Guided defence demonstration
+
+After installing the dependencies, run:
+
+```powershell
 npm run build
 npm run demo:defense
 ```
 
-Open **http://127.0.0.1:3600/#/defense** and choose **Start real demonstration**.
-This starts fixed deployment and test commands and drives the actual React
-checkout and wallet pages. The stand uses an isolated `runtime/defense-*` data
-directory, app port **3600**, Anvil RPC port **8665**, and chain ID **31337**.
-It preserves existing private/public site data. Technical proof is available
-without signing in. Prepared fictional personas handle the role-specific pages.
-
-After completion, **Review this verified run** opens deployment, purchase,
-licence, creator/co-author wallet, EVM proof and test-result views without
-repeating the purchase. If a port is already occupied, review the existing stand
-or deliberately stop that stand. Do not reset a network or kill an unknown process.
-
-The illustrated `/#/presentation` walkthrough sends no transactions. Use
-`/#/defense`, the actual account workflows, or the recorded MP4 to demonstrate
-execution. On PowerShell systems that block the npm wrapper, use `npm.cmd`.
-
-## Regular site and development
-
-For the built application, use separate terminals:
-
-```powershell
-# Terminal 1: local blockchain and contract deployment
-npm run chain
-```
-
-```powershell
-# Terminal 2: create fictional demo accounts/wallets, then start the app
-npm run demo:setup
-npm start
-```
-
-Open **http://localhost:3000/#/demo**. Buyer, creator and co-author can use
-separate tabs with independent sessions. One regular account can both buy and
-publish; those personas are not separate permission classes. Manager handles
-finance and disputes; administrator handles technical site controls.
-
-For development, keep the chain running and use `npm run dev`. Vite serves
-**http://localhost:5173** and proxies to the API on port **3000**. See the
-[architecture and transaction guide](docs/PUBLIC_REVIEW.md) for detailed
-upload, registration, checkout, dispute, refund and withdrawal flows.
+Open [the live defence demo](http://127.0.0.1:3600/#/defense) and choose
+**Start real demonstration**. It uses its own `runtime/defense-*` data directory,
+app port **3600** and Anvil port **8665**. **Review this verified run** opens the
+evidence from a completed run. The illustrated [walkthrough](http://localhost:3000/#/presentation)
+shows the same steps and uses no live payments. See the
+[architecture and transaction guide](docs/PUBLIC_REVIEW.md) for the full flow.
 
 ## Tests and reproducibility
 
@@ -127,6 +165,13 @@ performs a clean install, build and the configured test suites. Its badge and
 logs show the result of that particular revision. The saved video describes its
 own historical test run. Do not treat an old receipt or local test count as proof
 that a new CI run passed.
+
+In the current prototype, a prepared but unpaid subscription can block choosing
+a different plan until the quote expires. The creator link and the Favorites
+page are unfinished. Some automated checks still expect earlier UI labels or
+reapply migrations to a database whose schema version was reset. The standard
+demo was verified on a fresh database, and migration from schema 12 to 13 was
+checked separately.
 
 ## Stack and contract responsibilities
 
@@ -165,8 +210,9 @@ highlighting, filenames, directories and original line numbers, without IDE chro
 or a fullscreen overlay. Code and output scroll inside their panels so the page
 fits the viewport. Use the top tabs or arrow keys to change blocks.
 `?block=1` through `?block=4` opens a specific block. Select **RU** for Russian.
-Terminal and HTTP/RPC examples use placeholders and are explicitly labelled;
-the separate live node result reads the actual running network.
+Terminal and HTTP/RPC examples are labelled. The startup panel reads the
+six deployed contract addresses and transaction hashes from the running local
+network. The payout panel checks the selected escrow transaction live.
 
 The storage map distinguishes SQLite rows, original files, Anvil contract storage
 and signing-key locations, and explains generated TXT license records. It documents paths and

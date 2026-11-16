@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useData, useAction, useFeedback } from '../lib/workspace';
 import { useDialog } from './dialogs';
 import { Button } from './ui';
+import { DemoAccountPicker } from './demo-account-picker';
 
 export function AccountMenu() {
   const { user, plans, artworks } = useData();
@@ -33,6 +34,7 @@ export function AccountMenu() {
         </div>
         <span className="account-plan-badge">{plans[user.plan].name}</span>
       </div>
+      <DemoAccountPicker />
       <nav aria-label="Account shortcuts">
         <Link className="account-menu-row" to="/privacy" onClick={close}>
           <ShieldCheck size={18} />

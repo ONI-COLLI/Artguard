@@ -16,6 +16,7 @@ import { walletError } from '../lib/blockchain';
 import { PageHeading, Button } from '../components/ui';
 import { AccessPanel } from '../components/dialogs';
 import { WalletPanel } from '../components/wallet';
+import { useDisplayCurrency } from '../components/currency';
 import { PlanCards } from '../components/plan-cards';
 import { ChainAmount, CurrencyNote } from '../components/currency';
 type Data = { subscription: SubscriptionState; orders: SubscriptionOrder[] };
@@ -29,12 +30,14 @@ function load(key: string): Saved | null {
   }
 }
 export default function Billing() {
+  const { money } = useDisplayCurrency();
   const { user, plans } = useData(),
     client = useQueryClient(),
     { notify } = useFeedback(),
     connection = useConnection(),
     write = useWriteContract(),
     [params] = useSearchParams();
+  const checkoutRef = useRef<HTMLElement>(null);
   const key = `artguard:subscription:${user?.id}`;
   const [saved, setSaved] = useState<Saved | null>(() => load(key)),
     [selected, setSelected] = useState<string | null>(saved?.id || null),
@@ -98,6 +101,7 @@ export default function Billing() {
       setAccepted(false);
       setError('');
       void query.refetch();
+      requestAnimationFrame(() => checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     },
     onError: (e) => setError(walletError(e)),
   });
@@ -264,30 +268,44 @@ export default function Billing() {
                 : 'Manual payments only. Your wallet is never charged automatically.'}
             </p>
           </div>
+          {!current && (preferred === 'premium' || preferred === 'business') && (
+            <p className="local-note" role="status">
+              Interested in {plans[preferred].name}? Choose it below to review the exact test ETH charge before any wallet payment.
+            </p>
+          )}
           <PlanCards
-            onChoose={(plan) => prepare.mutate(plan)}
+            onChoose={(plan) => {
+              if (!user.wallet) {
+                setError('Connect your wallet below before preparing a subscription payment.');
+                document.getElementById('billing-wallet')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+              }
+              prepare.mutate(plan);
+            }}
             onFree={() => manage.mutate(false)}
             disabled={
               !user.emailVerified ||
-              !user.wallet ||
               !!hash ||
               pay.isPending ||
               prepare.isPending ||
               manage.isPending
             }
             busy={prepare.isPending}
-            selected={prepare.variables || preferred}
+            selected={current && current.status !== 'confirmed' && current.status !== 'failed' ? current.plan : null}
           />
           {current && (
-            <section className="panel form-panel">
-              <h2>{plans[current.plan].name} subscription order</h2>
-              <CurrencyNote />
-              <p>
-                <ChainAmount wei={current.quote.amount} /> · 30 days · {current.status}
-              </p>
-              <p className="small-text muted">
-                Buyer {current.quote.buyer} · Contract {current.contractAddress}
-              </p>
+            <section className="panel form-panel billing-checkout" ref={checkoutRef} aria-label="Review subscription payment">
+              <span className="eyebrow">Next step · wallet payment</span>
+              <h2>Review {plans[current.plan].name} before paying</h2>
+              <div className="billing-quote-summary">
+                <div><span>Charged from your wallet</span><strong><ChainAmount wei={current.quote.amount} /></strong></div>
+                <div><span>Displayed plan price</span><strong>{money(plans[current.plan].price, true)}</strong></div>
+                <div><span>Access period</span><strong>30 days, prepaid</strong></div>
+              </div>
+              <p className="small-text muted">Only test ETH on ArtGuard Local is transferred. The selected display currency is an estimate. Network gas is additional; no automatic renewal.</p>
+              <details className="billing-payment-details"><summary>Contract and wallet details</summary>
+                <p className="small-text muted">Buyer {current.quote.buyer} · Contract {current.contractAddress}</p>
+              </details>
               {current.status === 'confirmed' ? (
                 <p role="status">
                   Payment verified. Access ends{' '}
@@ -323,6 +341,7 @@ export default function Billing() {
                       prepaid payment.
                     </span>
                   </label>
+                  {!matching && <p className="local-note" role="status">Connect your linked wallet to ArtGuard Local in the Wallet connection section below before paying.</p>}
                   <div className="actions">
                     <Button
                       busy={fund.isPending}
@@ -353,7 +372,7 @@ export default function Billing() {
               {error || walletError(confirm.error || query.error)}
             </p>
           )}
-          <details className="panel form-panel" open={!matching}>
+          <details className="panel form-panel" id="billing-wallet" open={!matching}>
             <summary>Wallet connection and local network</summary>
             <WalletPanel showEarnings={false} />
           </details>

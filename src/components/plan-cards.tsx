@@ -106,7 +106,7 @@ export function PlanCards({
                   </span>
                 )}
                 {!current && selected === id && (
-                  <span className="current-plan-label">Selected</span>
+                  <span className="current-plan-label">Order prepared</span>
                 )}
               </div>
               <p className="plan-description">{descriptions[id]}</p>

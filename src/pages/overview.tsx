@@ -235,6 +235,18 @@ export default function Home() {
         )}
       </section>
 
+      <section className="home-value" aria-labelledby="home-value-title">
+        <div className="home-section-heading"><div>
+          <span className="eyebrow">Built for creative work in Kazakhstan</span>
+          <h2 id="home-value-title">One clear path from project to licensed use.</h2>
+        </div></div>
+        <div className="home-value-grid">
+          <article><span>01 · For creators</span><h3>Publish with clear terms</h3><p>Set the price, license period and co-author shares for each project. Every co-author approves their share before publication.</p></article>
+          <article><span>02 · For buyers</span><h3>Know what you receive</h3><p>See permitted use, file format and license period before paying. The project page shows the creator and what the purchase includes.</p></article>
+          <article><span>03 · For both sides</span><h3>Track the test payment</h3><p>On the local test network, escrow holds payment until delivery is accepted. The transaction can be checked directly on the chain.</p></article>
+        </div>
+      </section>
+
       <section
         className="home-activity"
         aria-labelledby="home-activity-title"

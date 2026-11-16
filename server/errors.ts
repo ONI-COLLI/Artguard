@@ -20,8 +20,8 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, _req, res, _ne
     res.status(error.code === 'LIMIT_FILE_SIZE' ? 413 : 400).json({
       error:
         error.code === 'LIMIT_FILE_SIZE'
-          ? 'Choose an image no larger than 20 MB.'
-          : 'Invalid upload. Use one original image and up to 7 additional photos.',
+          ? 'Each file must be no larger than 20 MB.'
+          : 'Invalid upload. Use one cover, one optional product file and up to 7 gallery photos.',
     });
     return;
   }

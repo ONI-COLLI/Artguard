@@ -71,8 +71,7 @@ export function MarketProceeds({ onWithdraw }: { onWithdraw?: () => void }) {
       void query.refetch();
     },
   });
-  const balances =
-    query.data?.balances.filter((b) => b.version !== 1 || BigInt(b.amountWei) > 0n) || [];
+  const balances = query.data?.balances.filter((b) => BigInt(b.amountWei) > 0n) || [];
   if (!user?.wallet) return null;
   return (
     <div className="market-proceeds">
@@ -86,6 +85,13 @@ export function MarketProceeds({ onWithdraw }: { onWithdraw?: () => void }) {
           'Local marketplace offline'
         )}
       </p>
+      <p className="small-text muted">
+        This is test ETH credited to your wallet inside the contract. Withdraw transfers it to your wallet balance.
+        You choose when to send that transaction and pay only the network gas; the platform fee was already deducted at sale.
+      </p>
+      {query.data && balances.length === 0 && (
+        <p className="small-text muted">No test ETH is waiting for withdrawal.</p>
+      )}
       {balances.map((b) => (
         <div key={b.contractAddress} className="contract-balance">
           {balances.length > 1 && (
@@ -109,7 +115,7 @@ export function MarketProceeds({ onWithdraw }: { onWithdraw?: () => void }) {
           </Button>
         </div>
       ))}
-      <p className="small-text muted">Payouts go to your linked wallet.</p>
+      {balances.length > 0 && <p className="small-text muted">Payouts go to your linked wallet.</p>}
       {!!query.data?.earnings.length && (
         <details className="payout-details">
           <summary>Verified revenue receipts ({query.data.earnings.length})</summary>

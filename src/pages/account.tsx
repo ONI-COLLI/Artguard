@@ -267,9 +267,8 @@ export function Analytics() {
         <AccessPanel />
       </>
     );
-  const localSales = d.sales.filter((s) => !s.payment),
-    gross = localSales.reduce((s, a) => s + a.amount, 0),
-    net = localSales.reduce((s, a) => s + a.net, 0),
+  const gross = d.sales.reduce((s, a) => s + a.amount, 0),
+    net = d.sales.reduce((s, a) => s + a.net, 0),
     chainNet = d.sales.reduce((sum, s) => sum + (s.payment ? creatorCredit(s.payment) : 0n), 0n);
   return (
     <>
@@ -292,15 +291,15 @@ export function Analytics() {
       />
       <div className="analytics-stats">
         {[
-          ['Gross sales', money(gross)],
-          ['Platform fees', money(gross - net)],
-          ['Net recorded earnings', money(net)],
+          ['License sales · all payments', money(gross)],
+          ['Platform fees · all payments', money(gross - net)],
+          ['After platform fee · before co-author split', money(net)],
           ['Licenses sold', d.sales.length],
         ].map(([l, v]) => (
           <div className="panel metric" key={l}>
             <span>{l}</span>
             <strong>{v}</strong>
-            <small>Local records · no real funds</small>
+            <small>Recorded local orders + confirmed test-chain sales</small>
           </div>
         ))}
       </div>
@@ -311,8 +310,8 @@ export function Analytics() {
             <ChainAmount wei={chainNet} />
           </strong>
           <p className="small-text muted">
-            Your creator share from verified local-chain sales. Co-author receipts appear below.
-            Verified chain payments are shown separately from simulated local orders.
+            Your creator share from confirmed test-chain sales, after the platform fee and co-author split.
+            This amount is part of the totals above; it is not added twice.
           </p>
           <MarketProceeds />
         </div>
@@ -424,30 +423,30 @@ export function Profile() {
       <PageHeading
         kicker="Your account"
         title="Profile"
-        description={`${u.name} · ${u.email}`}
+        description="Your work, purchases and account in one place."
         action={
           <Button onClick={() => dialog.open('Your account', <AccountMenu />)}>
             Account actions
           </Button>
         }
       />
-      <section className="profile-plans" aria-labelledby="profile-plans-title">
-        <div className="profile-section-heading">
-          <div>
-            <h2 id="profile-plans-title">Your plan</h2>
-            <p>Compare monthly price, sales commission and workspace features.</p>
-          </div>
-          <Link to="/billing">
-            Manage billing <ArrowRight size={14} />
-          </Link>
+      <section className="profile-overview" aria-label="Account overview">
+        <div className="profile-overview-intro">
+          <span className="avatar">{u.name[0]}</span>
+          <div><strong>{u.name}</strong><span>{u.email}</span></div>
+          <span className="profile-plan-badge">{d.plans[u.plan].name} · {d.plans[u.plan].commission}% fee</span>
         </div>
-        <PlanCards />
-        <PlanPaymentNote />
+        <div className="profile-quick-links">
+          <Link to="/works"><strong>My artwork</strong><span>Manage projects and drafts <ArrowRight size={15} /></span></Link>
+          <Link to="/licenses"><strong>Licenses</strong><span>Your purchases and files <ArrowRight size={15} /></span></Link>
+          <Link to="/profile/wallet"><strong>Wallet</strong><span>Test ETH and payouts <ArrowRight size={15} /></span></Link>
+          <Link to="/billing"><strong>Plan & billing</strong><span>Compare plans and commission <ArrowRight size={15} /></span></Link>
+        </div>
       </section>
       <div className="profile-section-heading">
         <div>
-          <h2>Account settings</h2>
-          <p>Manage your details, wallet and upload preferences.</p>
+          <h2>Account details</h2>
+          <p>Only your name and email are shown here. Public creator details are managed separately.</p>
         </div>
       </div>
       <div className="profile-details-layout">
@@ -455,7 +454,7 @@ export function Profile() {
           className="panel form-panel"
           schema={profileSchema}
           warnUnsaved
-          defaults={{ name: u.name, email: u.email, role: u.role }}
+          defaults={{ name: u.name }}
           onSubmit={async (v, form) => {
             await profile.mutateAsync(v);
             form.reset(v);
@@ -466,34 +465,21 @@ export function Profile() {
             });
           }}
         >
-          <h3>Personal details</h3>
-          <Link to="/privacy">Manage public alias, privacy & support →</Link>
-          <Field name="name" label="Name / studio" maxLength={80} />
-          <Field name="email" label="Email address" type="email" />
-          <p className="field-hint">
-            One account lets you buy licenses, publish projects and collaborate with other creators.
-          </p>
-          <Submit>
-            Save profile <ArrowRight size={16} />
-          </Submit>
+          <h3>Account details</h3>
+          <Field name="name" label="Display name" maxLength={80} />
+          <div className="profile-locked-field">
+            <span>Sign-in email</span>
+            <strong>{u.email}</strong>
+            <small>{u.emailVerified ? 'Verified address' : 'Verification pending'} · Email changes are disabled until a separate verification flow is available.</small>
+          </div>
+          <div className="profile-form-actions">
+            <Submit>
+              Save profile <ArrowRight size={16} />
+            </Submit>
+            <Link to="/security">Account security <ArrowRight size={14} /></Link>
+          </div>
         </Form>
         <div className="profile-details-side">
-          <div className="panel profile-wallet-summary">
-            <div>
-              <Wallet size={19} />
-              <div>
-                <h3>Wallet</h3>
-                <p>
-                  {u.wallet
-                    ? `Linked · ${u.wallet.address.slice(0, 6)}…${u.wallet.address.slice(-4)}`
-                    : 'Connect your wallet to get started'}
-                </p>
-              </div>
-            </div>
-            <Link className="button full" to="/profile/wallet">
-              Open wallet <ArrowRight size={14} />
-            </Link>
-          </div>
           {
             <details className="panel profile-detail-panel">
               <summary>

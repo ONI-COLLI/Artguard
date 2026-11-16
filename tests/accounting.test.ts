@@ -205,7 +205,7 @@ test('unsold deleted products remain archived and wallet unlinking retains addre
       .map((r) => r.action),
     ['created', 'updated', 'deleted'],
   );
-  assert.equal((await coauthor.request('/wallet', undefined, 'DELETE')).status, 200);
+  assert.equal((await coauthor.request('/wallet', { password: 'accounting-test-password' }, 'DELETE')).status, 200);
   const row = (await admin.request('/admin/accounting?view=users&q=' + coauthorId)).data.items[0];
   assert.equal(row.wallet, null);
   assert.equal(row.walletHistory.length, 1);

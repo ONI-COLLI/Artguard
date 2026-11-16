@@ -4,6 +4,7 @@ import { useData, useWorkspace, useBusy, useFeedback } from '../lib/workspace';
 import { useDialog } from './dialogs';
 import { Button, date } from './ui';
 import { AccountMenu } from './account-menu';
+import { DemoAccountPicker } from './demo-account-picker';
 import { LegalNotice } from './legal-consent';
 import { CurrencyPicker } from './currency';
 import { isProfilePath, MainNavigation, ProfileNavigation } from './navigation';
@@ -18,7 +19,7 @@ export function Layout() {
     profileArea = !!u && isProfilePath(pathname);
   function showProfile() {
     if (!u) {
-      auth();
+      open('Choose a test profile', <DemoAccountPicker />);
       return;
     }
     open('Your account', <AccountMenu />);

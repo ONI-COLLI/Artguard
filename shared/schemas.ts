@@ -42,8 +42,6 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({ email, password });
 export const profileSchema = z.object({
   name,
-  email,
-  role: z.enum(['Creator and buyer', 'Creator', 'Buyer', 'Studio']).default('Creator and buyer'),
 });
 export const licenseSchema = z.enum(['personal', 'commercial', 'extended']);
 const artworkDetailsSchema = z.object({

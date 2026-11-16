@@ -49,7 +49,7 @@ export function BlockchainCheckout({
   showItemSummary?: boolean;
 }) {
   const { money } = useDisplayCurrency();
-  const { user, artworks } = useData(),
+  const { user, artworks, privacy } = useData(),
     market = useMarketStatus(),
     connection = useConnection(),
     write = useWriteContract(),
@@ -370,9 +370,14 @@ export function BlockchainCheckout({
           )}
           {!current || current.status === 'failed' || expired ? (
             <>
+              {privacy && !privacy.accepted && (
+                <p className="local-note" role="status">
+                  Before buying, <a href="#/privacy">review and accept the current terms</a>. Then return to this project.
+                </p>
+              )}
               {missing && (
                 <p className="small-text muted">
-                  Test ETH payments are not available for this artwork. Choose Local order.
+                  This project needs blockchain registration before test ETH payment. Ask the creator to register it on the project page.
                 </p>
               )}
               {expired && (
@@ -381,7 +386,7 @@ export function BlockchainCheckout({
               <Button
                 className="primary full"
                 busy={prepare.isPending}
-                disabled={!user?.wallet || !market.data?.ready || !!missing || !items.length}
+                disabled={!user?.wallet || !market.data?.ready || !!missing || !items.length || (privacy && !privacy.accepted)}
                 onClick={() => prepare.mutate()}
               >
                 {current ? 'Refresh price' : 'Continue to payment'}

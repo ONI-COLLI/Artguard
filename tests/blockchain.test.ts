@@ -421,7 +421,7 @@ test('wallets and verified records survive restart and stale chain instances are
   assert.equal((await guest.request('/blockchain/status')).data.ready, false);
   assert.equal((await guest.request(`/blockchain/artworks/${artwork.id}`)).data.verified, false);
   await writeFile(join(directory, 'chain', 'registry.json'), JSON.stringify(deployment));
-  await alice.request('/wallet', undefined, 'DELETE');
+  await alice.request('/wallet', { password: 'local-chain-test-password' }, 'DELETE');
   assert.equal((await alice.request('/state')).data.user.wallet, null);
   assert.equal((await guest.request(`/blockchain/artworks/${artwork.id}`)).data.verified, true);
 });
@@ -1698,7 +1698,7 @@ test('co-author approvals reject forgery and stale revisions, keep drafts privat
     false,
   );
   await approveAndPublish(target.id);
-  assert.equal((await alice.request('/wallet', undefined, 'DELETE')).status, 200);
+  assert.equal((await alice.request('/wallet', { password: 'local-chain-test-password' }, 'DELETE')).status, 200);
   assert.equal(
     (await guest.request('/state')).data.artworks.some((a) => a.id === target.id),
     false,

@@ -25,6 +25,7 @@ import { maxGalleryImages } from '../shared/gallery.js';
 import { protectedPreview } from './previews.js';
 import { LEGAL_VERSION } from '../shared/legal.js';
 import { hasLegalConsent } from './privacy.js';
+import { artworkCover, coverBytes, imageDimensions, productFileType } from './product-files.js';
 function validateCreatorWallet(repo: Repository, ownerId: string, recipients: Recipient[]) {
   const wallet = repo.wallet(ownerId)?.address.toLowerCase();
   if (wallet && recipients.some((r) => r.wallet?.toLowerCase() === wallet))
@@ -48,7 +49,7 @@ export function artworkRoutes(repo: Repository, uploads: string) {
       storage: multer.memoryStorage(),
       limits: {
         fileSize: 20 * 1024 * 1024,
-        files: maxGalleryImages + 1,
+        files: maxGalleryImages + 2,
         fields: 20,
         fieldSize: 16384,
       },
@@ -69,6 +70,7 @@ export function artworkRoutes(repo: Repository, uploads: string) {
     },
     upload.fields([
       { name: 'file', maxCount: 1 },
+      { name: 'productFile', maxCount: 1 },
       { name: 'gallery', maxCount: maxGalleryImages },
     ]),
     async (req, res) => {
@@ -83,18 +85,23 @@ export function artworkRoutes(repo: Repository, uploads: string) {
       validateCreatorWallet(repo, u.id, a.recipients);
       if (a.status === 'published') requireVerified(repo, u);
       const files = req.files as Record<string, Express.Multer.File[]>;
-      const file = files?.file?.[0];
-      if (!file?.size) throw new HttpError(400, 'Choose an image up to 20 MB.');
-      const kind = imageType(file.buffer),
+      const cover = files?.file?.[0], file = files?.productFile?.[0] || cover;
+      if (!cover?.size || !file?.size) throw new HttpError(400, 'Choose a cover image and a nonempty product file up to 20 MB.');
+      const coverKind = imageType(cover.buffer);
+      const dimensions = await imageDimensions(cover.buffer);
+      const kind = productFileType(file.buffer),
         hash = createHash('sha256').update(file.buffer).digest('hex');
+      const fileDimensions = kind.mime.startsWith('image/') ? await imageDimensions(file.buffer) : null;
       if (repo.one('SELECT id FROM artworks WHERE hash=?', hash))
         throw new HttpError(409, 'This file is already registered locally.');
       quota(u.id);
       const id = randomUUID(),
-        filename = id + kind.ext;
+        filename = id + kind.ext,
+        coverName = file === cover ? filename : id + '-cover' + coverKind.ext;
       await writeFile(join(uploads, filename), file.buffer, { flag: 'wx' });
       let added: GalleryRow[] = [];
       try {
+        if (file !== cover) await writeFile(join(uploads, coverName), cover.buffer, { flag: 'wx' });
         added = await storeGallery(uploads, files?.gallery || []);
         repo.db.exec('BEGIN IMMEDIATE');
         try {
@@ -117,6 +124,8 @@ export function artworkRoutes(repo: Repository, uploads: string) {
             new Date().toISOString(),
           );
           repo.setArtworkRecipients(id, a.recipients);
+          repo.run('INSERT INTO artwork_covers VALUES(?,?,?,?,?,?,?)', id, coverName, coverKind.mime,
+            dimensions.width, dimensions.height, fileDimensions?.width ?? null, fileDimensions?.height ?? null);
           repo.run('INSERT INTO artwork_license_terms VALUES(?,?)', id, a.licenseDurationDays);
           repo.run('INSERT INTO artwork_usage_policies VALUES(?,?)', id, LEGAL_VERSION);
           saveGallery(repo, id, [], added);
@@ -130,6 +139,7 @@ export function artworkRoutes(repo: Repository, uploads: string) {
         }
       } catch (error) {
         await unlink(join(uploads, filename)).catch(() => {});
+        if (coverName !== filename) await unlink(join(uploads, coverName)).catch(() => {});
         await removeGalleryFiles(uploads, added);
         throw error;
       }
@@ -258,7 +268,7 @@ export function artworkRoutes(repo: Repository, uploads: string) {
         409,
         'This artwork has a promotion payment or open order. Save it as a draft instead.',
       );
-    const images = galleryRows(repo, a.id);
+    const images = galleryRows(repo, a.id), cover = artworkCover(repo, a);
     repo.db.exec('BEGIN IMMEDIATE');
     try {
       archiveProduct(repo, a.id, 'deleted');
@@ -270,6 +280,7 @@ export function artworkRoutes(repo: Repository, uploads: string) {
       throw error;
     }
     if (a.file_name) await unlink(join(uploads, a.file_name)).catch(() => {});
+    if (cover && cover.file_name !== a.file_name) await unlink(join(uploads, cover.file_name)).catch(() => {});
     await removeGalleryFiles(uploads, images);
     res.json(repo.snapshot(u));
   });
@@ -304,9 +315,10 @@ export function artworkRoutes(repo: Repository, uploads: string) {
   r.get('/media/:id', async (req, res) => {
     const a = repo.artwork(String(req.params.id));
     if (!repo.canView(a, req.user)) throw new HttpError(404, 'Image not found.');
-    const bytes = a.file_name ? await readFile(join(uploads, a.file_name)) : null;
+    const cover = artworkCover(repo, a);
+    const bytes = a.file_name ? await coverBytes(repo, uploads, a) : null;
     res
-      .type(!bytes || a.owner_id === req.user?.id ? a.mime : 'image/webp')
+      .type(!bytes || a.owner_id === req.user?.id ? cover?.mime || a.mime : 'image/webp')
       .set('Cache-Control', 'private, no-store')
       .send(
         bytes

@@ -18,7 +18,7 @@ import {
   type RegistrationState,
 } from '../shared/blockchain.js';
 import { serializeRegistration, type RegistrationRow } from './chain-records.js';
-import { requireUser, cookieToken, tokenHash } from './auth.js';
+import { requireUser, cookieToken, tokenHash, verifyPassword } from './auth.js';
 import type { Repository } from './repository.js';
 import { LocalBlockchain } from './blockchain.js';
 import { HttpError } from './errors.js';
@@ -178,13 +178,17 @@ export function blockchainRoutes(repo: Repository, chain: LocalBlockchain) {
     trackWallet(repo, user.id);
     res.json(repo.snapshot(user));
   });
-  r.delete('/wallet', (req, res) => {
+  r.delete('/wallet', async (req, res) => {
     const user = requireUser(req);
     if (publicDemo() && sharedDemoAccount(repo, user.id))
       throw new HttpError(
         403,
         'Shared demo wallets are fixed. Register your own account for an individual wallet.',
       );
+    const { password } = z.object({ password: z.string().min(1).max(128) }).parse(req.body);
+    const stored = repo.user(user.id);
+    if (!stored || !(await verifyPassword(password, stored.password_hash)))
+      throw new HttpError(403, 'Confirm your account password before unlinking a wallet.');
     repo.run('DELETE FROM wallets WHERE user_id=?', user.id);
     trackWallet(repo, user.id);
     repo.run('DELETE FROM wallet_challenges WHERE user_id=?', user.id);
