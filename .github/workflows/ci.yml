@@ -36,6 +36,8 @@ jobs:
         run: mkdir -p test-results
       - name: Build and type check
         run: npm run build 2>&1 | tee test-results/build.log
+      - name: Artwork registry contract tests
+        run: npm run test:registration 2>&1 | tee test-results/registration.log
       - name: Client unit tests
         run: npm run test:unit -- --maxWorkers=2 2>&1 | tee test-results/client.log
       - name: API integration tests

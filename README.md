@@ -146,6 +146,7 @@ not need real credentials or payments. Run these after `npm ci`:
 
 ```powershell
 npm run build
+npm run test:registration
 npm run test:unit -- --maxWorkers=2
 npm run test:api
 npm run test:blockchain
@@ -154,7 +155,10 @@ node --import tsx --test tests/deployment.test.ts
 ```
 
 `npm test` runs the complete configured sequence, including a build in the
-deployment checks. For the core contract scenario alone, run
+deployment checks. `npm run test:registration` runs five independent tests
+against `ArtworkRegistry` on a disposable local Anvil node. See the
+[registration test matrix and three security threats](docs/REGISTRATION_SECURITY.md).
+For the core escrow scenario alone, run
 **`npm run test:defense:contracts`**. Its ten EVM cases cover quote validation,
 exact commissions and shares, delivery/review timeouts, disputes, refunds,
 withdrawals, persistence and reconciliation. They exceed the five-test course
