@@ -161,8 +161,15 @@ against `ArtworkRegistry` on a disposable local Anvil node. See the
 For the core escrow scenario alone, run
 **`npm run test:defense:contracts`**. Its ten EVM cases cover quote validation,
 exact commissions and shares, delivery/review timeouts, disputes, refunds,
-withdrawals, persistence and reconciliation. They exceed the five-test course
+writhdrawals, persistence and reconciliation. They exceed the five-test course
 minimum. No measured code-coverage percentage or external security audit is claimed.
+
+The guided defence demonstration is backed by five unit-test files, run together
+by **`npm run test:defense:unit`**: `tests/demo-session.test.tsx` (per-tab demo
+profiles), `tests/blockchain-checkout.test.tsx` (chain checkout flow),
+`tests/revenue-sharing.test.tsx` (co-author share editor),
+`tests/buyer-license.test.tsx` (licence terms shown to the buyer) and
+`tests/escrow-ui.test.tsx` (escrow status and actions).
 
 [GitHub Actions](https://github.com/ONI-COLLI/Artguard/actions/workflows/ci.yml)
 performs a clean install, build and the configured test suites. Its badge and
