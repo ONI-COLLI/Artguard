@@ -171,6 +171,15 @@ profiles), `tests/blockchain-checkout.test.tsx` (chain checkout flow),
 `tests/buyer-license.test.tsx` (licence terms shown to the buyer) and
 `tests/escrow-ui.test.tsx` (escrow status and actions).
 
+The five registration unit tests live in `tests/artwork-registry.test.ts` and
+run with **`npm run test:registration`**:
+
+1. Registers the file and emits matching evidence
+2. Rejects a zero file hash
+3. Rejects a zero licence terms hash
+4. Rejects duplicate registration and preserves the original record
+5. Keeps records from two wallets separate
+
 [GitHub Actions](https://github.com/ONI-COLLI/Artguard/actions/workflows/ci.yml)
 performs a clean install, build and the configured test suites. Its badge and
 logs show the result of that particular revision. The saved video describes its
