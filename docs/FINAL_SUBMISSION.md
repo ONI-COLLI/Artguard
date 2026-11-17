@@ -7,7 +7,7 @@ downloaded DOCX and PDF are preserved. The revised PDF is the submission version
 
 ## Required human completion
 
-1. Review and take responsibility for the revised unpaid-founder assumptions, cash NPV,
+1. Review and take responsibility for the market-salary base case, cash NPV,
    conclusions, citations and code. Confirm actual contribution through each
    student's own work and commits. Check the current Scopus source list for the
    journals used and retain evidence. DOI metadata and publisher indexing records
@@ -36,7 +36,8 @@ downloaded DOCX and PDF are preserved. The revised PDF is the submission version
 ## Defence timing
 
 Use roughly seven minutes for the pitch and three minutes for the actual video.
-The 18 slides finish with Conclusion, AI Disclosure Statement and References.
+The 15 main slides finish with Conclusion, AI Disclosure Statement and References.
+The six appendix slides support questions.
 Every member should be ready for five minutes of questions about code and finance.
 The recording already shows real local deployment, escrow deposit, delivery,
 acceptance, an active licence, co-author withdrawal, chain proof and passing tests.
@@ -72,14 +73,12 @@ the actual local chain transactions; test ETH has no monetary value.
 Run `npm run finance:model` or save the complete JSON with
 `node scripts/finance-model.mjs artifacts/submission-review/financial-model.json`.
 The 447.94 KZT/USD rate is a frozen planning assumption, not a current-rate claim.
-Founder and employee cash salaries are **KZT 0**, consistent with unpaid
-self-development in the Endterm. Founder labour has an excluded opportunity cost.
-Three-year cash NPV is about **KZT 24.97 million**, cumulative cash recovery is
-**Month 19**, and base peak cash need is **KZT 7.52 million**. Year 1 FCF remains
-**−KZT 5.75 million** because launch/security costs precede sufficient revenue.
-The old 40m/26% proposal is retained for evaluation, not claimed as necessary:
-the corrected combined downside cash need is **KZT 11.10 million**. Validate demand,
-resize the raise and model any future salaries before making investment claims.
+That script reproduces the unpaid-founder comparison. Its three-year NPV at 25%
+is **+KZT 24.97 million**, cash recovery is Month 19 and peak cash need is
+KZT 7.52 million. The current report and presentation use the market-salary case:
+**−KZT 21.43 million** NPV at 25%, peak cash need of KZT 35.76 million, and a
+36-month forecast that ends before payback. See the report’s forecast and
+sensitivity tables for the inputs and funding implications.
 
 The source archive excludes keys, databases, uploads, runtime chain state,
 dependencies and unrelated 3D scene files. Keep `.env` and all private runtime
