@@ -319,8 +319,9 @@ occurs in Month 19. `npm run test:finance-model` checks the comparison model.
 The [model snapshot](submission/financial-model.json) uses the fixed planning
 rate of 447.94 KZT/USD. The prototype settles fictional transactions in test ETH.
 
-AI assistance: **Codex, GPT-6.1 Sol**, including code, tests, demonstration tooling,
-captions, report editing and financial-model work. See [AI Disclosure](docs/AI_DISCLOSURE.md).
+AI assistance included **OpenAI Codex (GPT-6.1 Sol)** and **Anthropic Claude
+(Sonnet 5.5 and Opus 5.5)**. See [AI Disclosure](docs/AI_DISCLOSURE.md) for how
+the team used each model.
 Every member must review and explain the design, calculations, conclusions and
 code and document actual work in their own self-evaluation.
 
