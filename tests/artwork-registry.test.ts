@@ -147,7 +147,7 @@ async function assertReverts(fileHash: Hex, termsHash: Hex, expected: string) {
   );
 }
 
-test('a mined registration stores its sender, terms and block timestamp and emits matching evidence', async () => {
+test('Registers the file and emits matching evidence', async () => {
   const receipt = await register(alice, sampleFile, originalTerms);
   const block = await chain.getBlock({ blockHash: receipt.blockHash });
   assert.deepEqual(await record(sampleFile), [alice, originalTerms, block.timestamp]);
@@ -166,24 +166,24 @@ test('a mined registration stores its sender, terms and block timestamp and emit
   });
 });
 
-test('a zero file hash is rejected with InvalidHash and has no registry entry', async () => {
+test('Rejects a zero file hash', async () => {
   await assertReverts(emptyHash, originalTerms, 'InvalidHash');
   assert.deepEqual(await record(emptyHash), [zeroAddress, emptyHash, 0n]);
 });
 
-test('a zero terms hash is rejected with InvalidHash and leaves the file unregistered', async () => {
+test('Rejects a zero licence terms hash', async () => {
   await assertReverts(sampleFile, emptyHash, 'InvalidHash');
   assert.deepEqual(await record(sampleFile), [zeroAddress, emptyHash, 0n]);
 });
 
-test('repeat registration of the same file with revised terms is rejected and preserves the original record', async () => {
+test('Rejects duplicate registration and preserves the original record', async () => {
   await register(alice, sampleFile, originalTerms);
   const original = await record(sampleFile);
   await assertReverts(sampleFile, revisedTerms, 'AlreadyRegistered');
   assert.deepEqual(await record(sampleFile), original);
 });
 
-test('distinct file fingerprints can use the same terms without mixing the two registrants', async () => {
+test('Keeps records from two wallets separate', async () => {
   await register(alice, sampleFile, originalTerms);
   const first = await record(sampleFile);
   await register(bob, otherFile, originalTerms);
