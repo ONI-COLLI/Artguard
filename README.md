@@ -22,7 +22,7 @@ from installing Node.js to opening the demo accounts.
 | Item                                     | Link or status                                                                                                                                                                                                                       |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Report                                   | [Team03_FP_Report.pdf](deliverables/final-project/Team03_FP_Report.pdf): 15 main-text pages; title, contents, references and appendices are separate                                                                                 |
-| Presentation                             | [PDF for Moodle](deliverables/final-project/Team03_FP_Presentation.pdf) · [Editable PowerPoint](deliverables/final-project/Team03_FP_Presentation.pptx)                                                                              |
+| Presentation                             | [Current PDF for Moodle](deliverables/final-project/Team03_FP_Presentation.pdf) · [Earlier PowerPoint draft](deliverables/final-project/Team03_FP_Presentation.pptx) |
 | Defence speech                           | [English speaker text](deliverables/final-project/Team03_FP_Speech.pdf), with financial figures from the same unpaid-founder model                                                                                                   |
 | Demo video                               | [Download Team03_FP_Demo.mp4](deliverables/three-minute/Team03_FP_Demo.mp4): exactly 3:00 with English on-screen explanations                                                                                                        |
 | Required university OneDrive sharing URL | **Pending upload by the team.** The GitHub MP4 is a convenient copy, not the required institutional sharing URL.                                                                                                                     |
@@ -140,6 +140,26 @@ app port **3600** and Anvil port **8665**. **Review this verified run** opens th
 evidence from a completed run. The illustrated [walkthrough](http://localhost:3000/#/presentation)
 shows the same steps and uses no live payments. See the
 [architecture and transaction guide](docs/PUBLIC_REVIEW.md) for the full flow.
+
+### Local ERC-20 and ERC-721 lab
+
+On the running local site, use **Demo Administrator** and open the
+[token lab](http://localhost:3000/#/admin/blockchain-demo?view=token).
+Choose **Issue both test tokens** to release a sample escrow order, issue 100 AGP
+(ERC-20) and claim a non-transferable licence receipt (ERC-721). The lab reads the
+balance, NFT owner and mint events from Anvil, then shows the contract addresses,
+token ID, block numbers and transaction hashes.
+
+For the same run from the repository root:
+
+```powershell
+npm run demo:tokens
+```
+
+Each run starts and stops its own temporary Anvil node. ArtGuard checkout uses
+native test ETH. See [the ERC-20 contract](contracts/PrototypePoints.sol),
+[the ERC-721 contract](contracts/PrototypeLicenseReceipt.sol) and
+[the verification script](scripts/token-demo.mjs).
 
 ## Tests and reproducibility
 

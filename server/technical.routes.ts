@@ -1,10 +1,15 @@
 import { Router } from 'express';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { z } from 'zod';
 import { requireUser } from './auth.js';
 import { requireVerified } from './security.js';
 import { HttpError } from './errors.js';
+import { publicDemo, publicOrigin } from './hosting.js';
 import type { Repository } from './repository.js';
 import type { LocalBlockchain } from './blockchain.js';
+
+const runFile = promisify(execFile);
 
 export function siteSettings(repo: Repository) {
   const get = (key: string) =>
@@ -16,6 +21,7 @@ export function siteSettings(repo: Repository) {
 }
 export function technicalRoutes(repo: Repository, chain: LocalBlockchain) {
   const router = Router();
+  let tokenDemoRunning = false;
   router.use('/admin/technical', (req, _res, next) => {
     const user = requireVerified(repo, requireUser(req));
     if (!repo.isAdmin(user.id))
@@ -47,6 +53,26 @@ export function technicalRoutes(repo: Repository, chain: LocalBlockchain) {
         'disabled',
       ),
     });
+  });
+  router.post('/admin/technical/token-demo', async (req, res) => {
+    const local = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress || '');
+    if (!local || publicDemo() || publicOrigin()) {
+      throw new HttpError(403, 'Token issuance is available in the local technical demo.');
+    }
+    if (tokenDemoRunning) throw new HttpError(409, 'A token demo is already running.');
+    tokenDemoRunning = true;
+    try {
+      const { stdout } = await runFile(process.execPath, ['--import', 'tsx', 'scripts/token-demo.mjs'], {
+        windowsHide: true,
+        maxBuffer: 64 * 1024,
+      });
+      res.json(JSON.parse(stdout));
+    } catch (error) {
+      console.error('Local token demo failed:', error instanceof Error ? error.message : error);
+      throw new HttpError(503, 'The isolated Anvil token demo failed. Check the server terminal.');
+    } finally {
+      tokenDemoRunning = false;
+    }
   });
   router.patch('/admin/technical/settings', (req, res) => {
     const values = z

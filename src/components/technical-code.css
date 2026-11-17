@@ -564,3 +564,40 @@
     gap: 4px;
   }
 }
+.token-example-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.token-example-grid > * {
+  min-width: 0;
+}
+.token-example pre {
+  overflow: auto;
+  padding: 16px;
+  background: #151515;
+  border-radius: 8px;
+  color: #f6c3a9;
+}
+.token-example form label,
+.token-id-result {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+.token-id-result code {
+  overflow-wrap: anywhere;
+}
+.token-live {
+  margin-bottom: 20px;
+}
+.token-proof code {
+  overflow-wrap: anywhere;
+}
+.token-proof dt {
+  color: var(--muted, #bbb);
+}
+.token-proof dd {
+  margin: 4px 0 10px;
+}

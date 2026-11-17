@@ -17,6 +17,7 @@
     "scene:test": "node --test demos/industrial-scene/yard.test.mjs",
     "demo:setup": "node --env-file-if-exists=.env --import tsx scripts/demo-setup.ts",
     "demo:accounts": "node --env-file-if-exists=.env --import tsx scripts/demo-accounts.ts",
+    "demo:tokens": "node --import tsx scripts/token-demo.mjs",
     "verify:purchase": "node --import tsx scripts/verify-purchase.ts",
     "accounting": "node --env-file-if-exists=.env --import tsx scripts/accounting.ts",
     "mail": "node --env-file-if-exists=.env scripts/mail.mjs",

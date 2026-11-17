@@ -89,6 +89,9 @@ export default function Technical() {
               <Link className="button" to="/admin/blockchain-demo">
                 Open interactive blockchain lab →
               </Link>
+              <Link className="button" to="/admin/blockchain-demo?view=token">
+                ERC-20 and ERC-721 lab →
+              </Link>
             </article>
             <article className="panel form-panel">
               <h3>Verification queue</h3>

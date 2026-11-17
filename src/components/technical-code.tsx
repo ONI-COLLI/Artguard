@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { linearSteps, linearStorage, studioBlocks } from '../lib/linear-walkthrough';
 import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
 import { LiveChainResult } from './live-chain-result';
@@ -46,12 +47,14 @@ export default function TechnicalCodeWalkthrough({
   showLanguageControl = true,
   block: suppliedBlock,
   onBlockChange,
+  tokenExampleHref,
 }: {
   language?: CodeLanguage;
   onLanguageChange?: (language: CodeLanguage) => void;
   showLanguageControl?: boolean;
   block?: number;
   onBlockChange?: (index: number) => void;
+  tokenExampleHref?: string;
 } = {}) {
   const [localLanguage, setLocalLanguage] = useState<CodeLanguage>('en');
   const [localBlock, setLocalBlock] = useState(0);
@@ -104,6 +107,11 @@ export default function TechnicalCodeWalkthrough({
     >
       <div className="walkthrough-heading">
         <h1>{t(both('Blockchain: code and output', 'Блокчейн: код и вывод'))}</h1>
+        {tokenExampleHref && (
+          <Link className="button small" to={tokenExampleHref}>
+            {t(both('ERC-20 and ERC-721', 'ERC-20 и ERC-721'))}
+          </Link>
+        )}
         {showLanguageControl && (
           <div className="technical-language" role="group" aria-label="Explanation language">
             {(['en', 'ru'] as const).map((value) => (

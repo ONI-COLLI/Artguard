@@ -1,10 +1,11 @@
 import { lazy, Suspense } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useData } from '../lib/workspace';
 import { PageHeading } from '../components/ui';
 import { both, translated, type CodeLanguage, type Translation } from '../lib/demo-language';
 import '../components/technical-code.css';
 import TechnicalCodeWalkthrough from '../components/technical-code';
+import TokenExample from '../components/token-example';
 const BlockchainProof = lazy(() =>
   import('../components/blockchain-proof').then((m) => ({ default: m.BlockchainProof })),
 );
@@ -14,9 +15,11 @@ const BlockchainSandbox = lazy(() =>
 
 export default function BlockchainDemonstration() {
   const [params, setParams] = useSearchParams();
+  const { pathname } = useLocation();
   const language: CodeLanguage = params.get('lang') === 'ru' ? 'ru' : 'en';
   const t = (value: Translation) => translated(value, language);
-  const { user } = useData();
+  const tokenView = params.get('view') === 'token';
+  const { user, publicDemo } = useData();
   const tools = params.get('tools') === '1' && !!user?.isAdmin && user.emailVerified;
   const archive = params.get('legacy') === '1';
   const requestedBlock = Number(params.get('block'));
@@ -34,11 +37,21 @@ export default function BlockchainDemonstration() {
     Number.isInteger(requestedBlock) && requestedBlock >= 1 && requestedBlock <= 4
       ? requestedBlock - 1
       : mapped;
+  if (tokenView) {
+    return (
+      <TokenExample
+        language={language}
+        backHref={pathname + '?lang=' + language}
+        canMint={!!user?.isAdmin && user.emailVerified && !publicDemo}
+      />
+    );
+  }
   if (!tools && !archive)
     return (
       <TechnicalCodeWalkthrough
         language={language}
         block={block}
+        tokenExampleHref={pathname + '?view=token&lang=' + language}
         onLanguageChange={(value) =>
           setParams(
             (previous) => {
