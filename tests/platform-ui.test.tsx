@@ -7,6 +7,12 @@ import Billing from '../src/pages/billing';
 import { ForgotPasswordForm, EmailAction } from '../src/components/account-security';
 import { ApiError } from '../src/lib/api';
 import { planRules } from '../shared/schemas';
+
+Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+  configurable: true,
+  value: vi.fn(),
+});
+
 const mocks = vi.hoisted(() => ({
   api: vi.fn(),
   write: vi.fn(),
@@ -86,7 +92,7 @@ beforeEach(() => {
 });
 async function prepare() {
   await userEvent.click(screen.getByRole('button', { name: 'Choose Premium' }));
-  await screen.findByText('Premium subscription order');
+  await screen.findByRole('heading', { name: 'Review Premium before paying' });
 }
 it('requires reviewing a subscription quote and retains it after wallet rejection', async () => {
   mocks.write.mockRejectedValueOnce(new Error('Payment rejected in wallet'));

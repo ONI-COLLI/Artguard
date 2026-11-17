@@ -15,6 +15,8 @@ local test ETH.
 **Running it for the first time?** See [Local setup](#local-setup) for everything
 from installing Node.js to opening the demo accounts.
 
+**Verifying the smart contract?** Use [the five registration unit tests](#five-registration-unit-tests).
+
 ## Course deliverables
 
 | Item                                     | Link or status                                                                                                                                                                                                                       |
@@ -141,8 +143,31 @@ shows the same steps and uses no live payments. See the
 
 ## Tests and reproducibility
 
-The tests create their own temporary accounts, servers and local chains. They do
-not need real credentials or payments. Run these after `npm ci`:
+### Five registration unit tests
+
+From the repository root, install the locked dependencies and run the test command.
+
+```powershell
+npm ci --include=optional --include=dev
+npm run test:registration
+```
+
+[`tests/artwork-registry.test.ts`](tests/artwork-registry.test.ts) starts its own
+temporary local Anvil node and deploys `ArtworkRegistry` for each test.
+
+1. Registers the file and emits matching evidence
+2. Rejects a zero file hash
+3. Rejects a zero licence terms hash
+4. Rejects duplicate registration and preserves the original record
+5. Keeps records from two wallets separate
+
+A successful run ends with `# tests 5`, `# pass 5` and `# fail 0`. See the
+[registration test matrix and three security threats](docs/REGISTRATION_SECURITY.md).
+
+### Full prototype checks
+
+The suites use temporary data and test accounts. Run `npm test` for the complete
+local sequence, or run the build and suites individually.
 
 ```powershell
 npm run build
@@ -154,14 +179,10 @@ npm run test:finance-model
 node --import tsx --test tests/deployment.test.ts
 ```
 
-`npm test` runs the complete configured sequence, including a build in the
-deployment checks. `npm run test:registration` runs five independent tests
-against `ArtworkRegistry` on a disposable local Anvil node. See the
-[registration test matrix and three security threats](docs/REGISTRATION_SECURITY.md).
 For the core escrow scenario alone, run
 **`npm run test:defense:contracts`**. Its ten EVM cases cover quote validation,
 exact commissions and shares, delivery/review timeouts, disputes, refunds,
-writhdrawals, persistence and reconciliation. They exceed the five-test course
+withdrawals, persistence and reconciliation. They exceed the five-test course
 minimum. No measured code-coverage percentage or external security audit is claimed.
 
 The guided defence demonstration is backed by five unit-test files, run together
@@ -171,15 +192,6 @@ profiles), `tests/blockchain-checkout.test.tsx` (chain checkout flow),
 `tests/buyer-license.test.tsx` (licence terms shown to the buyer) and
 `tests/escrow-ui.test.tsx` (escrow status and actions).
 
-The five registration unit tests live in `tests/artwork-registry.test.ts` and
-run with **`npm run test:registration`**:
-
-1. Registers the file and emits matching evidence
-2. Rejects a zero file hash
-3. Rejects a zero licence terms hash
-4. Rejects duplicate registration and preserves the original record
-5. Keeps records from two wallets separate
-
 [GitHub Actions](https://github.com/ONI-COLLI/Artguard/actions/workflows/ci.yml)
 performs a clean install, build and the configured test suites. Its badge and
 logs show the result of that particular revision. The saved video describes its
@@ -188,10 +200,7 @@ that a new CI run passed.
 
 In the current prototype, a prepared but unpaid subscription can block choosing
 a different plan until the quote expires. The creator link and the Favorites
-page are unfinished. Some automated checks still expect earlier UI labels or
-reapply migrations to a database whose schema version was reset. The standard
-demo was verified on a fresh database, and migration from schema 12 to 13 was
-checked separately.
+page are unfinished.
 
 ## Stack and contract responsibilities
 

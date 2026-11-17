@@ -59,21 +59,22 @@ function setup() {
     </MemoryRouter>,
   );
 }
-it('keeps the description and purchase essentials visible while registration stays in additional information', async () => {
+it('shows buyers the public registration link under additional information', async () => {
   setup();
   expect(screen.getByRole('heading', { name: 'Quiet City' })).toBeVisible();
   expect(screen.getByRole('combobox', { name: 'License' })).toBeVisible();
   expect(screen.getByText('$24.00')).toBeVisible();
   expect(screen.getByRole('heading', { name: 'Description' })).toBeVisible();
   expect(screen.getByText(mocks.artwork.description)).toBeVisible();
-  expect(screen.getByText('saved-transaction-hash')).not.toBeVisible();
+  expect(screen.queryByText('saved-transaction-hash')).not.toBeInTheDocument();
+  expect(screen.getByText('File registration')).not.toBeVisible();
   expect(screen.getByRole('button', { name: 'Get this license' })).toBeEnabled();
   await userEvent.click(screen.getByText('Additional information'));
   expect(screen.getByText(mocks.artwork.description)).toBeVisible();
-  expect(screen.getByText('saved-transaction-hash')).toBeVisible();
+  expect(screen.queryByText('saved-transaction-hash')).not.toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'View registration' })).toBeVisible();
   await userEvent.click(screen.getByText('Additional information'));
-  expect(screen.getByText('saved-transaction-hash')).not.toBeVisible();
+  expect(screen.getByText('File registration')).not.toBeVisible();
   expect(screen.getByText(mocks.artwork.description)).toBeVisible();
   await userEvent.click(screen.getByRole('button', { name: 'Get this license' }));
   expect(mocks.open).toHaveBeenCalledWith('Get a license', expect.anything());
@@ -84,6 +85,7 @@ it('keeps creator actions accessible while completed co-author details stay coll
   setup();
   expect(screen.getByRole('link', { name: 'Edit your artwork' })).toBeVisible();
   expect(screen.getByRole('button', { name: 'Promote' })).toBeVisible();
+  expect(screen.getByText('saved-transaction-hash')).toBeVisible();
   expect(screen.getByText('Co-author approval details')).not.toBeVisible();
   await userEvent.click(screen.getByRole('button', { name: 'Download original' }));
   expect(mocks.download).toHaveBeenCalledWith('/api/artworks/project/download');

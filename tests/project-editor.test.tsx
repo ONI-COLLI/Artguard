@@ -75,7 +75,7 @@ it('loads the project shares rather than upload defaults and saves edits as proj
   await userEvent.clear(share);
   await userEvent.type(share, '40');
   expect(screen.getByRole('status')).toHaveTextContent('60%');
-  await userEvent.click(screen.getByRole('button', { name: 'Save artwork' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save project' }));
   await waitFor(() => expect(mocks.api).toHaveBeenCalled());
   expect(mocks.api.mock.calls[0][0]).toBe('/artworks/project-a');
   expect(mocks.api.mock.calls[0][1]).toMatchObject({
@@ -99,7 +99,7 @@ it('submits project co-authors as JSON inside a multipart artwork upload', async
     new File(['synthetic png'], 'project.png', { type: 'image/png' }),
   );
   await userEvent.click(screen.getByRole('checkbox', { name: /I created this artwork/ }));
-  await userEvent.click(screen.getByRole('button', { name: 'Save artwork' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save project' }));
   await waitFor(() => expect(mocks.api).toHaveBeenCalled());
   const [path, options] = mocks.api.mock.calls[0];
   expect(path).toBe('/artworks');
@@ -113,7 +113,7 @@ it('clears the project recipients without falling back to upload defaults', asyn
   setup('/edit/project-a');
   await userEvent.click(screen.getByRole('button', { name: 'Remove co-author 1' }));
   expect(screen.getByRole('status')).toHaveTextContent('100%');
-  await userEvent.click(screen.getByRole('button', { name: 'Save artwork' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save project' }));
   await waitFor(() => expect(mocks.api).toHaveBeenCalled());
   expect(mocks.api.mock.calls[0][1].data.recipients).toEqual([]);
 });
@@ -122,7 +122,7 @@ it('refuses duplicate co-author wallets before uploading or saving', async () =>
   await userEvent.click(screen.getByRole('button', { name: 'Add co-author' }));
   await userEvent.type(screen.getAllByLabelText('Name / studio')[1], 'Another co-author');
   await userEvent.type(screen.getAllByLabelText('Ethereum wallet')[1], recipient.wallet);
-  await userEvent.click(screen.getByRole('button', { name: 'Save artwork' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Save project' }));
   expect(await screen.findByRole('alert')).toHaveTextContent(
     'Each co-author wallet must be unique.',
   );

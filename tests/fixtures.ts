@@ -24,6 +24,9 @@ export function planFixture(db: DatabaseSync, userId: string, plan: string) {
       'INSERT INTO subscriptions VALUES(?,?,?,0,?) ON CONFLICT(user_id) DO UPDATE SET plan=excluded.plan,valid_until=excluded.valid_until,cancel_at_end=0',
     ).run(userId, plan, Math.floor(Date.now() / 1000) + 30 * 86400, new Date().toISOString());
 }
+export function removeSchema13Tables(db: DatabaseSync) {
+  db.exec('DROP TABLE artwork_covers; DROP TABLE artwork_favorites; DROP TABLE creator_bios;');
+}
 export function approvedProjectFixture(db: DatabaseSync, id: string) {
   const repo = new Repository(db),
     artwork = repo.artwork(id)!;

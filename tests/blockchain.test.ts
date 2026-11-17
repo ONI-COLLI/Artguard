@@ -23,7 +23,7 @@ import {
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { localChain, registryAbi } from '../shared/blockchain.ts';
 import { createApp } from '../server/app.ts';
-import { verifiedFixture, planFixture } from './fixtures.ts';
+import { verifiedFixture, planFixture, removeSchema13Tables } from './fixtures.ts';
 import { ensureSubscriptions } from '../scripts/deploy-subscriptions.mjs';
 import { ensurePromotions } from '../scripts/deploy-promotions.mjs';
 import {
@@ -3152,6 +3152,7 @@ test('version 1 upgrades preserve old quotes, paid licenses, balances, recovery,
   const paidHash = await payOrder(orders[0], bobWallet, legacyMarketplaceAbi);
   const currentSchema = app.db.prepare('PRAGMA user_version').get().user_version;
   // Simulate an actual schema-3 installation, including a mined payment not yet reported to the API.
+  removeSchema13Tables(app.db);
   app.db.exec(
     'DROP TABLE chain_revenue_splits; DROP TABLE chain_checkout_versions; PRAGMA user_version=3;',
   );

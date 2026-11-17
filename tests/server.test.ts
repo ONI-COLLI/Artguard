@@ -7,7 +7,12 @@ import { fileURLToPath } from 'node:url';
 import { createApp } from '../server/app.ts';
 import { DatabaseSync } from 'node:sqlite';
 import { migrate } from '../server/migrations.ts';
-import { verifiedFixture, planFixture, approvedProjectFixture } from './fixtures.ts';
+import {
+  verifiedFixture,
+  planFixture,
+  approvedProjectFixture,
+  removeSchema13Tables,
+} from './fixtures.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 let app, base, directory, artwork, purchase;
@@ -172,7 +177,7 @@ test('guest workspace hides catalog and exposes no account credentials', async (
   assert.equal(r.data.artworks.length, 0);
   assert.equal(JSON.stringify(r.data).includes('password_hash'), false);
   assert.equal((await guest.request('/api/health')).data.blockchain, 'local-evm');
-  assert.equal(app.db.prepare('PRAGMA user_version').get().user_version, 12);
+  assert.equal(app.db.prepare('PRAGMA user_version').get().user_version, 13);
 });
 test('registration hashes passwords and isolates account sessions', async () => {
   const a = await alice.request('/api/auth/register', {
@@ -487,10 +492,11 @@ test('deletion is owner-only and existing licenses prevent removal', async () =>
 });
 test('saved accounts, files, and licenses persist across a server restart', async () => {
   // Existing installations predate versioned migrations. Adopt their schema in place.
+  removeSchema13Tables(app.db);
   app.db.exec('PRAGMA user_version=0');
   await app.close();
   app = await createApp({ dataDir: directory });
-  assert.equal(app.db.prepare('PRAGMA user_version').get().user_version, 12);
+  assert.equal(app.db.prepare('PRAGMA user_version').get().user_version, 13);
   await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
   base = `http://127.0.0.1:${app.server.address().port}`;
   const state = (await bob.request('/api/state')).data;
@@ -640,6 +646,7 @@ test('migration 5 copies existing portfolio shares once without changing purchas
   const db = new DatabaseSync(':memory:');
   try {
     migrate(db);
+    removeSchema13Tables(db);
     db.exec('DROP TABLE artwork_revenue_settings; PRAGMA user_version=4;');
     const recipients = [{ name: 'Legacy collaborator', percent: 25 }];
     db.prepare(
@@ -688,6 +695,7 @@ test('migration 5 copies existing portfolio shares once without changing purchas
         ),
         recipients,
       );
+    removeSchema13Tables(db);
     db.exec("UPDATE users SET recipients='[]'; PRAGMA user_version=4;");
     migrate(db);
     assert.deepEqual(
@@ -699,7 +707,7 @@ test('migration 5 copies existing portfolio shares once without changing purchas
       recipients,
     );
     assert.deepEqual(db.prepare('SELECT * FROM purchases WHERE id=?').get('paid'), original);
-    assert.equal(db.prepare('PRAGMA user_version').get().user_version, 12);
+    assert.equal(db.prepare('PRAGMA user_version').get().user_version, 13);
   } finally {
     db.close();
   }
